@@ -1,0 +1,683 @@
+/* =========================================================
+   GLOBAL
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  background: #0b0b0b;
+  color: white;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+.app {
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.header {
+  text-align: center;
+  padding: 45px 20px 30px;
+}
+
+.header h1 {
+  margin: 0;
+
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 800;
+
+  letter-spacing: -1px;
+
+  background: linear-gradient(
+    90deg,
+    #ffffff,
+    #81d8ff,
+    #ffffff
+  );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  color: transparent;
+}
+
+.header p {
+  margin: 10px 0 0;
+
+  color: #a3a3a3;
+
+  font-size: 16px;
+}
+
+
+/* =========================================================
+   MAIN LAYOUT
+   ========================================================= */
+
+.main-container {
+  width: min(1150px, 92%);
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(300px, 1fr)
+    minmax(300px, 1fr);
+
+  gap: 45px;
+
+  align-items: start;
+}
+
+
+/* =========================================================
+   INPUT SECTION
+   ========================================================= */
+
+.input-section {
+  padding: 30px;
+
+  background: #151515;
+
+  border: 1px solid #292929;
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.input-section h2 {
+  margin-top: 0;
+  margin-bottom: 25px;
+
+  color: white;
+
+  font-size: 24px;
+}
+
+
+/* =========================================================
+   PHOTO UPLOAD
+   ========================================================= */
+
+.upload-box {
+  margin-bottom: 25px;
+
+  padding: 28px;
+
+  text-align: center;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(129, 216, 255, 0.08),
+      transparent 65%
+    ),
+    #101010;
+
+  border: 1px dashed rgba(129, 216, 255, 0.35);
+
+  border-radius: 18px;
+
+  box-shadow:
+    inset 0 0 25px rgba(129, 216, 255, 0.03),
+    0 10px 30px rgba(0, 0, 0, 0.2);
+
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.upload-box:hover {
+  border-color: rgba(129, 216, 255, 0.65);
+
+  box-shadow:
+    inset 0 0 25px rgba(129, 216, 255, 0.05),
+    0 10px 35px rgba(0, 0, 0, 0.3);
+}
+
+.upload-box p {
+  margin-top: 0;
+  margin-bottom: 18px;
+
+  color: #bdbdbd;
+
+  font-size: 15px;
+}
+
+
+/* =========================================================
+   CHOOSE PHOTO BUTTON
+   ========================================================= */
+
+.upload-button {
+  display: inline-block;
+
+  padding: 11px 22px;
+
+  background: #171717;
+
+  color: #81d8ff;
+
+  border: 1px solid #3a5968;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.upload-button:hover {
+  background: #1d2a31;
+
+  border-color: #81d8ff;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 0 15px rgba(129, 216, 255, 0.12);
+}
+
+.upload-button:active {
+  transform: translateY(1px);
+}
+
+
+/* =========================================================
+   FORM LABELS
+   ========================================================= */
+
+.input-section > label {
+  display: block;
+
+  margin-bottom: 20px;
+}
+
+.input-section > label span {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #d6d6d6;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   TEXT INPUTS
+   ========================================================= */
+
+.input-section > label input[type="text"] {
+  width: 100%;
+
+  padding: 14px 16px;
+
+  background: #0d0d0d;
+
+  color: white;
+
+  border: 1px solid #3a3a3a;
+
+  border-radius: 12px;
+
+  outline: none;
+
+  font-size: 15px;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.input-section > label input[type="text"]::placeholder {
+  color: #707070;
+}
+
+.input-section > label input[type="text"]:focus {
+  border-color: #81d8ff;
+
+  box-shadow:
+    0 0 0 3px rgba(129, 216, 255, 0.1);
+}
+
+
+/* =========================================================
+   GENERATE BUTTON WRAPPER
+   ========================================================= */
+
+.generate-button-wrapper {
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  margin-top: 30px;
+}
+
+
+/* =========================================================
+   STARDUST GENERATE BUTTON
+   ========================================================= */
+
+.generate-button {
+  --bg: #0a1929;
+  --radius: 100px;
+
+  position: relative;
+
+  overflow: hidden;
+
+  border: 0;
+  outline: none;
+
+  cursor: pointer;
+
+  border-radius: var(--radius);
+
+  background-color: var(--bg);
+
+  color: rgba(129, 216, 255, 0.95);
+
+  font-size: 18px;
+  font-weight: 600;
+
+  padding: 18px 34px;
+
+  text-shadow:
+    0 0 8px rgba(129, 216, 255, 0.35);
+
+  isolation: isolate;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.3s ease;
+
+  box-shadow:
+    inset 0 0.3rem 0.9rem rgba(255, 255, 255, 0.3),
+    inset 0 -0.1rem 0.3rem rgba(0, 0, 0, 0.7),
+    inset 0 -0.4rem 0.9rem rgba(255, 255, 255, 0.5),
+    0 1.5rem 2rem rgba(0, 0, 0, 0.3),
+    0 0.8rem 1rem -0.6rem rgba(0, 0, 0, 0.8);
+}
+
+
+/* Stardust glow */
+
+.generate-button::before {
+  content: "";
+
+  position: absolute;
+
+  left: -15%;
+  right: -15%;
+
+  bottom: 25%;
+  top: -100%;
+
+  border-radius: 50%;
+
+  background-color: rgba(64, 180, 255, 0.15);
+
+  transition: transform 0.3s ease;
+
+  z-index: -1;
+}
+
+
+/* Top highlight */
+
+.generate-button::after {
+  content: "";
+
+  position: absolute;
+
+  left: 6%;
+  right: 6%;
+
+  top: 12%;
+  bottom: 40%;
+
+  border-radius: 22px 22px 0 0;
+
+  box-shadow:
+    inset 0 10px 8px -10px rgba(129, 216, 255, 0.6);
+
+  background: linear-gradient(
+    180deg,
+    rgba(64, 180, 255, 0.25) 0%,
+    rgba(0, 0, 0, 0) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+
+  z-index: -1;
+}
+
+
+/* Hover */
+
+.generate-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    inset 0 0.3rem 0.5rem rgba(129, 216, 255, 0.4),
+    inset 0 -0.1rem 0.3rem rgba(0, 0, 0, 0.7),
+    inset 0 -0.4rem 0.9rem rgba(64, 180, 255, 0.6),
+    0 1.5rem 2rem rgba(0, 0, 0, 0.3),
+    0 0.8rem 1rem -0.6rem rgba(0, 0, 0, 0.8);
+}
+
+.generate-button:hover::before {
+  transform: translateY(-5%);
+}
+
+.generate-button:hover::after {
+  opacity: 0.4;
+
+  transform: translateY(5%);
+}
+
+
+/* Click */
+
+.generate-button:active {
+  transform: translateY(4px);
+
+  box-shadow:
+    inset 0 0.3rem 0.5rem rgba(129, 216, 255, 0.5),
+    inset 0 -0.1rem 0.3rem rgba(0, 0, 0, 0.8),
+    inset 0 -0.4rem 0.9rem rgba(64, 180, 255, 0.4),
+    0 1.5rem 2rem rgba(0, 0, 0, 0.3);
+}
+
+
+/* =========================================================
+   PREVIEW SECTION
+   ========================================================= */
+
+.preview-section {
+  padding: 30px;
+
+  background: #151515;
+
+  border: 1px solid #292929;
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.preview-section > h2 {
+  margin-top: 0;
+  margin-bottom: 25px;
+
+  color: white;
+
+  font-size: 24px;
+}
+
+
+/* =========================================================
+   BUILDER CARD
+   ========================================================= */
+
+.builder-card {
+  width: 100%;
+  max-width: 390px;
+
+  min-height: 500px;
+
+  margin: 0 auto;
+
+  padding: 30px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  text-align: center;
+
+  background:
+    radial-gradient(
+      circle at top,
+      rgba(80, 190, 255, 0.15),
+      transparent 40%
+    ),
+    #171717;
+
+  border: 1px solid #3b3b3b;
+
+  border-radius: 24px;
+
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.4);
+}
+
+
+/* =========================================================
+   CARD TITLE
+   ========================================================= */
+
+.card-event-title {
+  margin: 0 0 25px;
+
+  font-size: 22px;
+
+  color: #81d8ff;
+}
+
+
+/* =========================================================
+   CARD PHOTO
+   ========================================================= */
+
+.card-photo {
+  width: 150px;
+  height: 150px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 50%;
+
+  border: 3px solid #81d8ff;
+
+  background: #262626;
+
+  color: #888;
+
+  box-shadow:
+    0 0 25px rgba(129, 216, 255, 0.15);
+}
+
+.card-photo img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+
+/* =========================================================
+   CARD NAME
+   ========================================================= */
+
+.card-name {
+  margin: 25px 0 8px;
+
+  font-size: 27px;
+
+  color: white;
+}
+
+
+/* =========================================================
+   CARD ROLE
+   ========================================================= */
+
+.card-role {
+  margin: 0 0 12px;
+
+  color: #81d8ff;
+
+  font-size: 16px;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   CARD TECH STACK
+   ========================================================= */
+
+.card-stack {
+  margin: 0;
+
+  color: #b5b5b5;
+
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   CARD FOOTER
+   ========================================================= */
+
+.card-footer {
+  width: 100%;
+
+  margin-top: auto;
+
+  padding-top: 25px;
+
+  color: #666;
+
+  font-size: 12px;
+
+  letter-spacing: 1px;
+
+  border-top: 1px solid #303030;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+  .main-container {
+    grid-template-columns: 1fr;
+
+    width: min(600px, 92%);
+
+    gap: 30px;
+  }
+
+  .input-section {
+    order: 1;
+  }
+
+  .preview-section {
+    order: 2;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .header {
+    padding-top: 30px;
+  }
+
+  .header h1 {
+    font-size: 34px;
+  }
+
+  .header p {
+    font-size: 14px;
+  }
+
+  .main-container {
+    width: 92%;
+  }
+
+  .input-section,
+  .preview-section {
+    padding: 20px;
+  }
+
+  .upload-box {
+    padding: 22px 15px;
+  }
+
+  .builder-card {
+    min-height: 450px;
+
+    padding: 25px;
+  }
+
+  .card-photo {
+    width: 125px;
+    height: 125px;
+  }
+
+  .card-name {
+    font-size: 23px;
+  }
+
+  .generate-button {
+    font-size: 16px;
+
+    padding: 16px 28px;
+  }
+}
