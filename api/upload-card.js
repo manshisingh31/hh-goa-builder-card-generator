@@ -2,7 +2,9 @@ import { put } from "@vercel/blob";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    return res.status(405).json({
+      error: "Method not allowed",
+    });
   }
 
   try {
@@ -14,23 +16,31 @@ export default async function handler(req, res) {
 
     const file = Buffer.concat(chunks);
 
+    if (!file.length) {
+      return res.status(400).json({
+        error: "No card image received",
+      });
+    }
+
     const blob = await put(
       `hh-goa/${Date.now()}-builder-card.png`,
       file,
       {
         access: "public",
         contentType: "image/png",
+        storeId: process.env.HHGOA_STORE_ID,
       }
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       url: blob.url,
     });
   } catch (error) {
-    console.error("Upload error:", error);
+    console.error("Card upload failed:", error);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: "Could not upload card",
+      details: error?.message || "Unknown error",
     });
   }
 }
