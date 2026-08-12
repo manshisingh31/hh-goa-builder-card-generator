@@ -93,7 +93,8 @@ function App() {
       })
     );
 
-    const rect = card.getBoundingClientRect();
+    const rect =
+      card.getBoundingClientRect();
 
     if (!rect.width || !rect.height) {
       throw new Error(
@@ -106,43 +107,48 @@ function App() {
     const scale =
       targetWidth / rect.width;
 
-    const canvas = await html2canvas(
-      card,
-      {
-        scale: scale,
+    const canvas =
+      await html2canvas(
+        card,
+        {
+          scale: scale,
 
-        useCORS: true,
+          useCORS: true,
 
-        allowTaint: false,
+          allowTaint: false,
 
-        backgroundColor: null,
+          backgroundColor: null,
 
-        imageTimeout: 0,
+          imageTimeout: 0,
 
-        logging: false,
+          logging: false,
 
-        windowWidth:
-          document.documentElement
-            .clientWidth,
+          windowWidth:
+            document.documentElement
+              .clientWidth,
 
-        windowHeight:
-          document.documentElement
-            .clientHeight,
-      }
-    );
+          windowHeight:
+            document.documentElement
+              .clientHeight,
+        }
+      );
 
     // ========================================
     // EXACT 1080 × 1350 OUTPUT
     // ========================================
 
     const outputCanvas =
-      document.createElement("canvas");
+      document.createElement(
+        "canvas"
+      );
 
     outputCanvas.width = 1080;
     outputCanvas.height = 1350;
 
     const ctx =
-      outputCanvas.getContext("2d");
+      outputCanvas.getContext(
+        "2d"
+      );
 
     if (!ctx) {
       throw new Error(
@@ -150,9 +156,11 @@ function App() {
       );
     }
 
-    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingEnabled =
+      true;
 
-    ctx.imageSmoothingQuality = "high";
+    ctx.imageSmoothingQuality =
+      "high";
 
     ctx.drawImage(
       canvas,
@@ -193,23 +201,31 @@ function App() {
           }
 
           const url =
-            URL.createObjectURL(blob);
+            URL.createObjectURL(
+              blob
+            );
 
           const link =
-            document.createElement("a");
+            document.createElement(
+              "a"
+            );
 
           link.href = url;
 
           link.download =
             "HH-GOA-2026-Builder-Card.png";
 
-          document.body.appendChild(link);
+          document.body.appendChild(
+            link
+          );
 
           link.click();
 
           link.remove();
 
-          URL.revokeObjectURL(url);
+          URL.revokeObjectURL(
+            url
+          );
         },
 
         "image/png",
@@ -233,7 +249,9 @@ function App() {
   // CANVAS → PNG FILE
   // ==========================================
 
-  const canvasToFile = (canvas) => {
+  const canvasToFile = (
+    canvas
+  ) => {
     return new Promise(
       (resolve, reject) => {
         canvas.toBlob(
@@ -248,15 +266,16 @@ function App() {
               return;
             }
 
-            const file = new File(
-              [blob],
+            const file =
+              new File(
+                [blob],
 
-              "HH-GOA-2026-Builder-Card.png",
+                "HH-GOA-2026-Builder-Card.png",
 
-              {
-                type: "image/png",
-              }
-            );
+                {
+                  type: "image/png",
+                }
+              );
 
             resolve(file);
           },
@@ -273,19 +292,23 @@ function App() {
   // UPLOAD PNG TO VERCEL BLOB
   // ==========================================
 
-  const uploadCard = async (file) => {
-    const response = await fetch(
-      "/api/upload-card",
-      {
-        method: "POST",
+  const uploadCard = async (
+    file
+  ) => {
+    const response =
+      await fetch(
+        "/api/upload-card",
+        {
+          method: "POST",
 
-        headers: {
-          "Content-Type": "image/png",
-        },
+          headers: {
+            "Content-Type":
+              "image/png",
+          },
 
-        body: file,
-      }
-    );
+          body: file,
+        }
+      );
 
     const responseText =
       await response.text();
@@ -309,9 +332,10 @@ function App() {
     let data;
 
     try {
-      data = JSON.parse(
-        responseText
-      );
+      data =
+        JSON.parse(
+          responseText
+        );
     } catch {
       throw new Error(
         "Upload API returned an invalid response: " +
@@ -331,22 +355,39 @@ function App() {
   // ==========================================
   // SHARE TO X
   //
-  // Flow:
+  // IMPORTANT:
+  // The X tab is opened IMMEDIATELY when the
+  // user clicks the button. This prevents
+  // Chrome from blocking the popup.
   //
-  // Generate PNG
-  //      ↓
-  // Upload PNG
-  //      ↓
-  // Create preview page
-  //      ↓
-  // Open X
-  //
-  // Caption:
-  // HH GOA 2026 #FrameInGoa
+  // Then we generate and upload the card.
+  // Finally, the already-open tab is sent
+  // to the X composer.
   // ==========================================
 
   const shareToX = async () => {
     if (sharing) {
+      return;
+    }
+
+    // ========================================
+    // OPEN X TAB IMMEDIATELY
+    // ========================================
+
+    const xWindow =
+      window.open(
+        "about:blank",
+        "_blank"
+      );
+
+    // Chrome may still block the popup if
+    // popups are disabled for this website.
+
+    if (!xWindow) {
+      setError(
+        "Please allow pop-ups for this website and click Share to X again."
+      );
+
       return;
     }
 
@@ -355,37 +396,39 @@ function App() {
 
       setSharing(true);
 
-      // --------------------------------------
-      // Generate final card
-      // --------------------------------------
+      // ======================================
+      // GENERATE FINAL CARD
+      // ======================================
 
       const outputCanvas =
         await createCardCanvas();
 
-      // --------------------------------------
-      // Convert to PNG
-      // --------------------------------------
+      // ======================================
+      // CONVERT CANVAS TO PNG
+      // ======================================
 
       const file =
         await canvasToFile(
           outputCanvas
         );
 
-      // --------------------------------------
-      // Upload PNG
-      // --------------------------------------
+      // ======================================
+      // UPLOAD PNG
+      // ======================================
 
       const imageUrl =
-        await uploadCard(file);
+        await uploadCard(
+          file
+        );
 
       console.log(
         "Uploaded image URL:",
         imageUrl
       );
 
-      // --------------------------------------
-      // Create server-rendered preview page
-      // --------------------------------------
+      // ======================================
+      // CREATE PREVIEW PAGE
+      // ======================================
 
       const sharePage =
         `${window.location.origin}/api/share-card?image=${encodeURIComponent(
@@ -397,19 +440,23 @@ function App() {
         sharePage
       );
 
-      // --------------------------------------
-      // REQUIRED X CAPTION
-      // --------------------------------------
+      // ======================================
+      // X CAPTION
+      // ======================================
 
       const caption =
         "HH GOA 2026 #FrameInGoa";
 
-      // --------------------------------------
-      // Put caption + preview page into X
-      // --------------------------------------
+      // ======================================
+      // CREATE X POST TEXT
+      // ======================================
 
       const xText =
         `${caption}\n\n${sharePage}`;
+
+      // ======================================
+      // CREATE X COMPOSER URL
+      // ======================================
 
       const xURL =
         `https://x.com/intent/post?text=${encodeURIComponent(
@@ -421,28 +468,31 @@ function App() {
         xURL
       );
 
-      // --------------------------------------
-      // Open X composer
-      // --------------------------------------
+      // ======================================
+      // MOVE ALREADY-OPEN TAB TO X
+      // ======================================
 
-      window.open(
-        xURL,
-        "_blank",
-        "noopener,noreferrer"
-      );
+      xWindow.location.href =
+        xURL;
 
       setSharing(false);
+
     } catch (error) {
       console.error(
         "Could not share card:",
         error
       );
 
+      // Close blank tab if something failed.
+      try {
+        xWindow.close();
+      } catch {
+        // Ignore close errors.
+      }
+
       setSharing(false);
 
-      // Show the REAL error instead of
-      // hiding it behind a generic message.
-
+      // Show the REAL error.
       setError(
         error?.message ||
           "Could not prepare the card for sharing."
@@ -515,7 +565,8 @@ function App() {
                   color: "red",
                   marginTop: "10px",
                   fontSize: "14px",
-                  wordBreak: "break-word",
+                  wordBreak:
+                    "break-word",
                 }}
               >
                 {error}
@@ -592,7 +643,6 @@ function App() {
                   event.target.value
                 )
               }
-
             />
 
           </label>
@@ -604,7 +654,9 @@ function App() {
             <button
               className="generate-button"
               type="button"
-              onClick={downloadCard}
+              onClick={
+                downloadCard
+              }
             >
               Generate Card
             </button>
@@ -623,7 +675,9 @@ function App() {
             <button
               className="share-button"
               type="button"
-              onClick={shareToX}
+              onClick={
+                shareToX
+              }
               disabled={sharing}
             >
 
