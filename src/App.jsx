@@ -33,8 +33,7 @@ function App() {
       "image/heif",
     ];
 
-    const fileName =
-      file.name.toLowerCase();
+    const fileName = file.name.toLowerCase();
 
     const validExtension =
       fileName.endsWith(".jpg") ||
@@ -57,8 +56,7 @@ function App() {
       return;
     }
 
-    const imageURL =
-      URL.createObjectURL(file);
+    const imageURL = URL.createObjectURL(file);
 
     setPhoto(imageURL);
   };
@@ -69,10 +67,9 @@ function App() {
   // ==========================================
 
   const createCardCanvas = async () => {
-    const card =
-      document.getElementById(
-        "builder-card"
-      );
+    const card = document.getElementById(
+      "builder-card"
+    );
 
     if (!card) {
       throw new Error(
@@ -81,9 +78,7 @@ function App() {
     }
 
     // Wait for all images to load
-
-    const images =
-      card.querySelectorAll("img");
+    const images = card.querySelectorAll("img");
 
     await Promise.all(
       Array.from(images).map((img) => {
@@ -98,13 +93,9 @@ function App() {
       })
     );
 
-    const rect =
-      card.getBoundingClientRect();
+    const rect = card.getBoundingClientRect();
 
-    if (
-      !rect.width ||
-      !rect.height
-    ) {
+    if (!rect.width || !rect.height) {
       throw new Error(
         "Card has invalid dimensions."
       );
@@ -112,57 +103,53 @@ function App() {
 
     const targetWidth = 1080;
 
-    const scale =
-      targetWidth / rect.width;
+    const scale = targetWidth / rect.width;
 
-    const canvas =
-      await html2canvas(
-        card,
-        {
-          scale: scale,
+    const canvas = await html2canvas(
+      card,
+      {
+        scale: scale,
 
-          useCORS: true,
+        useCORS: true,
 
-          allowTaint: false,
+        allowTaint: false,
 
-          backgroundColor: null,
+        backgroundColor: null,
 
-          imageTimeout: 0,
+        imageTimeout: 0,
 
-          logging: false,
+        logging: false,
 
-          windowWidth:
-            document.documentElement
-              .clientWidth,
+        windowWidth:
+          document.documentElement.clientWidth,
 
-          windowHeight:
-            document.documentElement
-              .clientHeight,
-        }
-      );
+        windowHeight:
+          document.documentElement.clientHeight,
+      }
+    );
 
     // ========================================
     // EXACT 1080 × 1350 OUTPUT
     // ========================================
 
     const outputCanvas =
-      document.createElement(
-        "canvas"
-      );
+      document.createElement("canvas");
 
     outputCanvas.width = 1080;
     outputCanvas.height = 1350;
 
     const ctx =
-      outputCanvas.getContext(
-        "2d"
+      outputCanvas.getContext("2d");
+
+    if (!ctx) {
+      throw new Error(
+        "Could not create canvas context."
       );
+    }
 
-    ctx.imageSmoothingEnabled =
-      true;
+    ctx.imageSmoothingEnabled = true;
 
-    ctx.imageSmoothingQuality =
-      "high";
+    ctx.imageSmoothingQuality = "high";
 
     ctx.drawImage(
       canvas,
@@ -203,31 +190,23 @@ function App() {
           }
 
           const url =
-            URL.createObjectURL(
-              blob
-            );
+            URL.createObjectURL(blob);
 
           const link =
-            document.createElement(
-              "a"
-            );
+            document.createElement("a");
 
           link.href = url;
 
           link.download =
             "HH-GOA-2026-Builder-Card.png";
 
-          document.body.appendChild(
-            link
-          );
+          document.body.appendChild(link);
 
           link.click();
 
           link.remove();
 
-          URL.revokeObjectURL(
-            url
-          );
+          URL.revokeObjectURL(url);
         },
 
         "image/png",
@@ -236,7 +215,6 @@ function App() {
       );
 
     } catch (error) {
-
       console.error(
         "Could not download card:",
         error
@@ -252,15 +230,11 @@ function App() {
   // CANVAS → PNG FILE
   // ==========================================
 
-  const canvasToFile = (
-    canvas
-  ) => {
+  const canvasToFile = (canvas) => {
     return new Promise(
       (resolve, reject) => {
-
         canvas.toBlob(
           (blob) => {
-
             if (!blob) {
               reject(
                 new Error(
@@ -271,16 +245,15 @@ function App() {
               return;
             }
 
-            const file =
-              new File(
-                [blob],
+            const file = new File(
+              [blob],
 
-                "HH-GOA-2026-Builder-Card.png",
+              "HH-GOA-2026-Builder-Card.png",
 
-                {
-                  type: "image/png",
-                }
-              );
+              {
+                type: "image/png",
+              }
+            );
 
             resolve(file);
           },
@@ -289,7 +262,6 @@ function App() {
 
           1
         );
-
       }
     );
   };
@@ -298,27 +270,21 @@ function App() {
   // UPLOAD PNG TO VERCEL BLOB
   // ==========================================
 
-  const uploadCard = async (
-    file
-  ) => {
+  const uploadCard = async (file) => {
+    const response = await fetch(
+      "/api/upload-card",
+      {
+        method: "POST",
 
-    const response =
-      await fetch(
-        "/api/upload-card",
-        {
-          method: "POST",
+        headers: {
+          "Content-Type": "image/png",
+        },
 
-          headers: {
-            "Content-Type":
-              "image/png",
-          },
-
-          body: file,
-        }
-      );
+        body: file,
+      }
+    );
 
     if (!response.ok) {
-
       const message =
         await response.text();
 
@@ -343,77 +309,94 @@ function App() {
   // ==========================================
   // SHARE TO X
   //
-  // Flow:
+  // IMPORTANT:
+  // The X window is opened immediately from
+  // the button click before any await operation.
   //
-  // Generate PNG
-  //      ↓
-  // Upload PNG
-  //      ↓
-  // Create preview page
-  //      ↓
-  // Open X
-  //
-  // Caption:
-  // HH GOA 2026 #FrameInGoa
+  // This prevents Chrome from blocking the
+  // popup because of the asynchronous upload.
   // ==========================================
 
   const shareToX = async () => {
-
     if (sharing) {
       return;
     }
 
-    try {
+    // ========================================
+    // OPEN WINDOW IMMEDIATELY
+    // ========================================
 
+    const xWindow = window.open(
+      "about:blank",
+      "_blank"
+    );
+
+    // Popup was blocked
+    if (!xWindow) {
+      setError(
+        "Please allow pop-ups for this website and try again."
+      );
+
+      return;
+    }
+
+    try {
       setError("");
+
       setSharing(true);
 
-      // --------------------------------------
-      // Generate final card
-      // --------------------------------------
+      // ======================================
+      // 1. GENERATE FINAL CARD
+      // ======================================
 
       const outputCanvas =
         await createCardCanvas();
 
-      // --------------------------------------
-      // Convert to PNG
-      // --------------------------------------
+      // ======================================
+      // 2. CONVERT CANVAS TO PNG
+      // ======================================
 
       const file =
         await canvasToFile(
           outputCanvas
         );
 
-      // --------------------------------------
-      // Upload PNG
-      // --------------------------------------
+      // ======================================
+      // 3. UPLOAD PNG TO VERCEL BLOB
+      // ======================================
 
       const imageUrl =
-        await uploadCard(
-          file
-        );
+        await uploadCard(file);
 
-      // --------------------------------------
-      // Create server-rendered
-      // preview page
-      // --------------------------------------
+      console.log(
+        "Uploaded card:",
+        imageUrl
+      );
+
+      // ======================================
+      // 4. CREATE SHARE PREVIEW PAGE
+      // ======================================
 
       const sharePage =
         `${window.location.origin}/api/share-card?image=${encodeURIComponent(
           imageUrl
         )}`;
 
-      // --------------------------------------
-      // REQUIRED X CAPTION
-      // --------------------------------------
+      console.log(
+        "Share page:",
+        sharePage
+      );
+
+      // ======================================
+      // 5. X CAPTION
+      // ======================================
 
       const caption =
         "HH GOA 2026 #FrameInGoa";
 
-      // --------------------------------------
-      // Put caption + generated
-      // card preview link into X
-      // --------------------------------------
+      // ======================================
+      // 6. CREATE X POST URL
+      // ======================================
 
       const xText =
         `${caption}\n\n${sharePage}`;
@@ -423,30 +406,37 @@ function App() {
           xText
         )}`;
 
-      // --------------------------------------
-      // Open X composer
-      // --------------------------------------
-
-      window.open(
-        xURL,
-        "_blank",
-        "noopener,noreferrer"
+      console.log(
+        "X URL:",
+        xURL
       );
 
-      setSharing(false);
+      // ======================================
+      // 7. NAVIGATE ALREADY-OPEN WINDOW
+      // ======================================
+
+      xWindow.location.href = xURL;
 
     } catch (error) {
-
       console.error(
         "Could not share card:",
         error
       );
 
-      setSharing(false);
+      // Close blank tab if something failed
+      try {
+        xWindow.close();
+      } catch {
+        // Ignore close errors
+      }
 
       setError(
-        "Could not prepare the card for sharing. Please try again."
+        error?.message ||
+          "Could not prepare the card for sharing. Please try again."
       );
+
+    } finally {
+      setSharing(false);
     }
   };
 
@@ -457,7 +447,9 @@ function App() {
   return (
     <div className="app">
 
-      {/* HEADER */}
+      {/* =====================================
+          HEADER
+      ====================================== */}
 
       <header className="header">
 
@@ -473,9 +465,9 @@ function App() {
 
       <main className="main-container">
 
-        {/* ====================================
+        {/* ===================================
             LEFT SIDE
-        ===================================== */}
+        ==================================== */}
 
         <section className="input-section">
 
@@ -483,7 +475,9 @@ function App() {
             Create your Builder Card
           </h2>
 
-          {/* PHOTO UPLOAD */}
+          {/* =================================
+              PHOTO UPLOAD
+          ================================== */}
 
           <div className="upload-box">
 
@@ -498,7 +492,17 @@ function App() {
               <input
                 type="file"
 
-                accept=".jpg,.jpeg,.png,.heic,.heif,image/jpeg,image/png,image/heic,image/heif"
+                accept="
+                  .jpg,
+                  .jpeg,
+                  .png,
+                  .heic,
+                  .heif,
+                  image/jpeg,
+                  image/png,
+                  image/heic,
+                  image/heif
+                "
 
                 onChange={
                   handlePhotoUpload
@@ -523,7 +527,9 @@ function App() {
 
           </div>
 
-          {/* NAME */}
+          {/* =================================
+              NAME
+          ================================== */}
 
           <label>
 
@@ -547,7 +553,9 @@ function App() {
 
           </label>
 
-          {/* ROLE */}
+          {/* =================================
+              ROLE
+          ================================== */}
 
           <label>
 
@@ -571,7 +579,9 @@ function App() {
 
           </label>
 
-          {/* TECH STACK */}
+          {/* =================================
+              TECH STACK
+          ================================== */}
 
           <label>
 
@@ -595,23 +605,25 @@ function App() {
 
           </label>
 
-          {/* GENERATE BUTTON */}
+          {/* =================================
+              GENERATE BUTTON
+          ================================== */}
 
           <div className="generate-button-wrapper">
 
             <button
               className="generate-button"
               type="button"
-              onClick={
-                downloadCard
-              }
+              onClick={downloadCard}
             >
               Generate Card
             </button>
 
           </div>
 
-          {/* SHARE BUTTON */}
+          {/* =================================
+              SHARE TO X BUTTON
+          ================================== */}
 
           <div
             className="generate-button-wrapper"
@@ -623,9 +635,7 @@ function App() {
             <button
               className="share-button"
               type="button"
-              onClick={
-                shareToX
-              }
+              onClick={shareToX}
               disabled={sharing}
             >
 
@@ -639,9 +649,9 @@ function App() {
 
         </section>
 
-        {/* ====================================
+        {/* ===================================
             RIGHT SIDE
-        ===================================== */}
+        ==================================== */}
 
         <section className="preview-section">
 
@@ -649,14 +659,18 @@ function App() {
             Preview
           </h2>
 
-          {/* BUILDER CARD */}
+          {/* =================================
+              BUILDER CARD
+          ================================== */}
 
           <div
             className="builder-card"
             id="builder-card"
           >
 
-            {/* EVENT TITLE */}
+            {/* ===============================
+                EVENT TITLE
+            ================================ */}
 
             <h2
               className="card-event-title"
@@ -664,7 +678,9 @@ function App() {
               HH GOA 2026
             </h2>
 
-            {/* PHOTO */}
+            {/* ===============================
+                PHOTO
+            ================================ */}
 
             <div
               className="card-photo"
@@ -687,7 +703,9 @@ function App() {
 
             </div>
 
-            {/* NAME */}
+            {/* ===============================
+                NAME
+            ================================ */}
 
             <h3
               className="card-name"
@@ -696,7 +714,9 @@ function App() {
                 "Your Name"}
             </h3>
 
-            {/* ROLE */}
+            {/* ===============================
+                ROLE
+            ================================ */}
 
             <p
               className="card-role"
@@ -705,7 +725,9 @@ function App() {
                 "Frontend Developer"}
             </p>
 
-            {/* TECH STACK */}
+            {/* ===============================
+                TECH STACK
+            ================================ */}
 
             <p
               className="card-stack"
@@ -714,7 +736,9 @@ function App() {
                 "React • JavaScript"}
             </p>
 
-            {/* FOOTER */}
+            {/* ===============================
+                FOOTER
+            ================================ */}
 
             <div
               className="card-footer"
