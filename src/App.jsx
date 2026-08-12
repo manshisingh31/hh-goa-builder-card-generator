@@ -8,168 +8,717 @@ function App() {
   const [techStack, setTechStack] = useState("");
   const [photo, setPhoto] = useState(null);
 
-  // Photo upload
-  const handlePhotoUpload = (event) => {
-    const file = event.target.files[0];
+  const [error, setError] = useState("");
+  const [sharing, setSharing] = useState(false);
 
-    if (file) {
-      const imageURL = URL.createObjectURL(file);
-      setPhoto(imageURL);
+  // ==========================================
+  // PHOTO UPLOAD
+  // JPG / JPEG / PNG / HEIC / HEIF ONLY
+  // ==========================================
+
+  const handlePhotoUpload = (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setError("");
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/heic",
+      "image/heif",
+    ];
+
+    const fileName =
+      file.name.toLowerCase();
+
+    const validExtension =
+      fileName.endsWith(".jpg") ||
+      fileName.endsWith(".jpeg") ||
+      fileName.endsWith(".png") ||
+      fileName.endsWith(".heic") ||
+      fileName.endsWith(".heif");
+
+    const validType =
+      allowedTypes.includes(file.type) ||
+      validExtension;
+
+    if (!validType) {
+      setError(
+        "Please upload only JPG, JPEG, PNG or HEIC/HEIF images."
+      );
+
+      event.target.value = "";
+
+      return;
+    }
+
+    const imageURL =
+      URL.createObjectURL(file);
+
+    setPhoto(imageURL);
+  };
+
+  // ==========================================
+  // CREATE FINAL CARD
+  // EXACT SIZE: 1080 × 1350
+  // ==========================================
+
+  const createCardCanvas = async () => {
+    const card =
+      document.getElementById(
+        "builder-card"
+      );
+
+    if (!card) {
+      throw new Error(
+        "Builder card not found."
+      );
+    }
+
+    // Wait for all images to load
+
+    const images =
+      card.querySelectorAll("img");
+
+    await Promise.all(
+      Array.from(images).map((img) => {
+        if (img.complete) {
+          return Promise.resolve();
+        }
+
+        return new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      })
+    );
+
+    const rect =
+      card.getBoundingClientRect();
+
+    if (
+      !rect.width ||
+      !rect.height
+    ) {
+      throw new Error(
+        "Card has invalid dimensions."
+      );
+    }
+
+    const targetWidth = 1080;
+
+    const scale =
+      targetWidth / rect.width;
+
+    const canvas =
+      await html2canvas(
+        card,
+        {
+          scale: scale,
+
+          useCORS: true,
+
+          allowTaint: false,
+
+          backgroundColor: null,
+
+          imageTimeout: 0,
+
+          logging: false,
+
+          windowWidth:
+            document.documentElement
+              .clientWidth,
+
+          windowHeight:
+            document.documentElement
+              .clientHeight,
+        }
+      );
+
+    // ========================================
+    // EXACT 1080 × 1350 OUTPUT
+    // ========================================
+
+    const outputCanvas =
+      document.createElement(
+        "canvas"
+      );
+
+    outputCanvas.width = 1080;
+    outputCanvas.height = 1350;
+
+    const ctx =
+      outputCanvas.getContext(
+        "2d"
+      );
+
+    ctx.imageSmoothingEnabled =
+      true;
+
+    ctx.imageSmoothingQuality =
+      "high";
+
+    ctx.drawImage(
+      canvas,
+
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+
+      0,
+      0,
+      1080,
+      1350
+    );
+
+    return outputCanvas;
+  };
+
+  // ==========================================
+  // DOWNLOAD CARD
+  // ==========================================
+
+  const downloadCard = async () => {
+    try {
+      setError("");
+
+      const outputCanvas =
+        await createCardCanvas();
+
+      outputCanvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            setError(
+              "Could not create PNG."
+            );
+
+            return;
+          }
+
+          const url =
+            URL.createObjectURL(
+              blob
+            );
+
+          const link =
+            document.createElement(
+              "a"
+            );
+
+          link.href = url;
+
+          link.download =
+            "HH-GOA-2026-Builder-Card.png";
+
+          document.body.appendChild(
+            link
+          );
+
+          link.click();
+
+          link.remove();
+
+          URL.revokeObjectURL(
+            url
+          );
+        },
+
+        "image/png",
+
+        1
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Could not download card:",
+        error
+      );
+
+      setError(
+        "Could not generate the card. Please try again."
+      );
     }
   };
 
-  // Generate / download card
-  const downloadCard = async () => {
-    const card = document.getElementById("builder-card");
+  // ==========================================
+  // CANVAS → PNG FILE
+  // ==========================================
 
-    if (!card) return;
+  const canvasToFile = (
+    canvas
+  ) => {
+    return new Promise(
+      (resolve, reject) => {
+
+        canvas.toBlob(
+          (blob) => {
+
+            if (!blob) {
+              reject(
+                new Error(
+                  "Could not create PNG."
+                )
+              );
+
+              return;
+            }
+
+            const file =
+              new File(
+                [blob],
+
+                "HH-GOA-2026-Builder-Card.png",
+
+                {
+                  type: "image/png",
+                }
+              );
+
+            resolve(file);
+          },
+
+          "image/png",
+
+          1
+        );
+
+      }
+    );
+  };
+
+  // ==========================================
+  // UPLOAD PNG TO VERCEL BLOB
+  // ==========================================
+
+  const uploadCard = async (
+    file
+  ) => {
+
+    const response =
+      await fetch(
+        "/api/upload-card",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "image/png",
+          },
+
+          body: file,
+        }
+      );
+
+    if (!response.ok) {
+
+      const message =
+        await response.text();
+
+      throw new Error(
+        message ||
+          "Card upload failed."
+      );
+    }
+
+    const data =
+      await response.json();
+
+    if (!data.url) {
+      throw new Error(
+        "Upload did not return an image URL."
+      );
+    }
+
+    return data.url;
+  };
+
+  // ==========================================
+  // SHARE TO X
+  //
+  // Flow:
+  //
+  // Generate PNG
+  //      ↓
+  // Upload PNG
+  //      ↓
+  // Create preview page
+  //      ↓
+  // Open X
+  //
+  // Caption:
+  // HH GOA 2026 #FrameInGoa
+  // ==========================================
+
+  const shareToX = async () => {
+
+    if (sharing) {
+      return;
+    }
 
     try {
-      const canvas = await html2canvas(card, {
-        useCORS: true,
-        scale: 2,
-        backgroundColor: "#171717",
-      });
 
-      const link = document.createElement("a");
+      setError("");
+      setSharing(true);
 
-      link.download = "HH-GOA-2026-Builder-Card.png";
-      link.href = canvas.toDataURL("image/png");
+      // --------------------------------------
+      // Generate final card
+      // --------------------------------------
 
-      link.click();
+      const outputCanvas =
+        await createCardCanvas();
+
+      // --------------------------------------
+      // Convert to PNG
+      // --------------------------------------
+
+      const file =
+        await canvasToFile(
+          outputCanvas
+        );
+
+      // --------------------------------------
+      // Upload PNG
+      // --------------------------------------
+
+      const imageUrl =
+        await uploadCard(
+          file
+        );
+
+      // --------------------------------------
+      // Create server-rendered
+      // preview page
+      // --------------------------------------
+
+      const sharePage =
+        `${window.location.origin}/api/share-card?image=${encodeURIComponent(
+          imageUrl
+        )}`;
+
+      // --------------------------------------
+      // REQUIRED X CAPTION
+      // --------------------------------------
+
+      const caption =
+        "HH GOA 2026 #FrameInGoa";
+
+      // --------------------------------------
+      // Put caption + generated
+      // card preview link into X
+      // --------------------------------------
+
+      const xText =
+        `${caption}\n\n${sharePage}`;
+
+      const xURL =
+        `https://x.com/intent/post?text=${encodeURIComponent(
+          xText
+        )}`;
+
+      // --------------------------------------
+      // Open X composer
+      // --------------------------------------
+
+      window.open(
+        xURL,
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+      setSharing(false);
+
     } catch (error) {
-      console.error("Could not generate card:", error);
+
+      console.error(
+        "Could not share card:",
+        error
+      );
+
+      setSharing(false);
+
+      setError(
+        "Could not prepare the card for sharing. Please try again."
+      );
     }
   };
+
+  // ==========================================
+  // UI
+  // ==========================================
 
   return (
     <div className="app">
 
       {/* HEADER */}
+
       <header className="header">
-        <h1>HH GOA 2026</h1>
-        <p>Builder Card Generator</p>
+
+        <h1>
+          HH GOA 2026
+        </h1>
+
+        <p>
+          Builder Card Generator
+        </p>
+
       </header>
 
       <main className="main-container">
 
-        {/* LEFT SIDE - FORM */}
+        {/* ====================================
+            LEFT SIDE
+        ===================================== */}
+
         <section className="input-section">
 
-          <h2>Create your Builder Card</h2>
+          <h2>
+            Create your Builder Card
+          </h2>
 
           {/* PHOTO UPLOAD */}
+
           <div className="upload-box">
-            <p>📸 Upload your photo</p>
+
+            <p>
+              📸 Upload your photo
+            </p>
 
             <label className="upload-button">
+
               Choose Photo
 
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/heic,image/*"
-                onChange={handlePhotoUpload}
+
+                accept=".jpg,.jpeg,.png,.heic,.heif,image/jpeg,image/png,image/heic,image/heif"
+
+                onChange={
+                  handlePhotoUpload
+                }
+
                 hidden
               />
+
             </label>
+
+            {error && (
+              <p
+                style={{
+                  color: "red",
+                  marginTop: "10px",
+                  fontSize: "14px",
+                }}
+              >
+                {error}
+              </p>
+            )}
+
           </div>
 
           {/* NAME */}
+
           <label>
-            <span>Name</span>
+
+            <span>
+              Name
+            </span>
 
             <input
               type="text"
+
               placeholder="Enter your name"
+
               value={name}
-              onChange={(event) => setName(event.target.value)}
+
+              onChange={(event) =>
+                setName(
+                  event.target.value
+                )
+              }
             />
+
           </label>
 
           {/* ROLE */}
+
           <label>
-            <span>Role / Stack</span>
+
+            <span>
+              Role / Stack
+            </span>
 
             <input
               type="text"
+
               placeholder="e.g. Frontend Developer"
+
               value={role}
-              onChange={(event) => setRole(event.target.value)}
+
+              onChange={(event) =>
+                setRole(
+                  event.target.value
+                )
+              }
             />
+
           </label>
 
           {/* TECH STACK */}
+
           <label>
-            <span>Tech Stack</span>
+
+            <span>
+              Tech Stack
+            </span>
 
             <input
               type="text"
+
               placeholder="e.g. React, JavaScript"
+
               value={techStack}
-              onChange={(event) => setTechStack(event.target.value)}
+
+              onChange={(event) =>
+                setTechStack(
+                  event.target.value
+                )
+              }
             />
+
           </label>
 
-          {/* STARDUST GENERATE BUTTON */}
+          {/* GENERATE BUTTON */}
+
           <div className="generate-button-wrapper">
+
             <button
               className="generate-button"
               type="button"
-              onClick={downloadCard}
+              onClick={
+                downloadCard
+              }
             >
               Generate Card
             </button>
+
+          </div>
+
+          {/* SHARE BUTTON */}
+
+          <div
+            className="generate-button-wrapper"
+            style={{
+              marginTop: "18px",
+            }}
+          >
+
+            <button
+              className="share-button"
+              type="button"
+              onClick={
+                shareToX
+              }
+              disabled={sharing}
+            >
+
+              {sharing
+                ? "Preparing..."
+                : "𝕏 Share to X"}
+
+            </button>
+
           </div>
 
         </section>
 
-        {/* RIGHT SIDE - PREVIEW */}
+        {/* ====================================
+            RIGHT SIDE
+        ===================================== */}
+
         <section className="preview-section">
 
-          <h2>Preview</h2>
+          <h2>
+            Preview
+          </h2>
 
-          {/* CARD TO BE DOWNLOADED */}
+          {/* BUILDER CARD */}
+
           <div
             className="builder-card"
             id="builder-card"
           >
 
             {/* EVENT TITLE */}
-            <h2 className="card-event-title">
+
+            <h2
+              className="card-event-title"
+            >
               HH GOA 2026
             </h2>
 
             {/* PHOTO */}
-            <div className="card-photo">
+
+            <div
+              className="card-photo"
+            >
 
               {photo ? (
+
                 <img
                   src={photo}
                   alt="Builder"
                 />
+
               ) : (
-                <span>Your Photo</span>
+
+                <span>
+                  Your Photo
+                </span>
+
               )}
 
             </div>
 
             {/* NAME */}
-            <h3 className="card-name">
-              {name || "Your Name"}
+
+            <h3
+              className="card-name"
+            >
+              {name ||
+                "Your Name"}
             </h3>
 
             {/* ROLE */}
-            <p className="card-role">
-              {role || "Frontend Developer"}
+
+            <p
+              className="card-role"
+            >
+              {role ||
+                "Frontend Developer"}
             </p>
 
             {/* TECH STACK */}
-            <p className="card-stack">
-              {techStack || "React • JavaScript"}
+
+            <p
+              className="card-stack"
+            >
+              {techStack ||
+                "React • JavaScript"}
             </p>
 
             {/* FOOTER */}
-            <div className="card-footer">
+
+            <div
+              className="card-footer"
+            >
               HH GOA 2026
             </div>
 

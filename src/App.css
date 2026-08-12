@@ -1,6 +1,6 @@
 /* =========================================================
-   GLOBAL
-   ========================================================= */
+GLOBAL
+========================================================= */
 
 * {
   box-sizing: border-box;
@@ -33,10 +33,9 @@ input {
   padding-bottom: 60px;
 }
 
-
 /* =========================================================
-   HEADER
-   ========================================================= */
+HEADER
+========================================================= */
 
 .header {
   text-align: center;
@@ -72,10 +71,9 @@ input {
   font-size: 16px;
 }
 
-
 /* =========================================================
-   MAIN LAYOUT
-   ========================================================= */
+MAIN LAYOUT
+========================================================= */
 
 .main-container {
   width: min(1150px, 92%);
@@ -93,10 +91,9 @@ input {
   align-items: start;
 }
 
-
 /* =========================================================
-   INPUT SECTION
-   ========================================================= */
+INPUT SECTION
+========================================================= */
 
 .input-section {
   padding: 30px;
@@ -120,10 +117,9 @@ input {
   font-size: 24px;
 }
 
-
 /* =========================================================
-   PHOTO UPLOAD
-   ========================================================= */
+PHOTO UPLOAD
+========================================================= */
 
 .upload-box {
   margin-bottom: 25px;
@@ -170,10 +166,9 @@ input {
   font-size: 15px;
 }
 
-
 /* =========================================================
-   CHOOSE PHOTO BUTTON
-   ========================================================= */
+CHOOSE PHOTO BUTTON
+========================================================= */
 
 .upload-button {
   display: inline-block;
@@ -215,10 +210,9 @@ input {
   transform: translateY(1px);
 }
 
-
 /* =========================================================
-   FORM LABELS
-   ========================================================= */
+FORM LABELS
+========================================================= */
 
 .input-section > label {
   display: block;
@@ -237,10 +231,9 @@ input {
   font-weight: 600;
 }
 
-
 /* =========================================================
-   TEXT INPUTS
-   ========================================================= */
+TEXT INPUTS
+========================================================= */
 
 .input-section > label input[type="text"] {
   width: 100%;
@@ -275,10 +268,9 @@ input {
     0 0 0 3px rgba(129, 216, 255, 0.1);
 }
 
-
 /* =========================================================
-   GENERATE BUTTON WRAPPER
-   ========================================================= */
+GENERATE BUTTON WRAPPER
+========================================================= */
 
 .generate-button-wrapper {
   display: flex;
@@ -289,10 +281,9 @@ input {
   margin-top: 30px;
 }
 
-
 /* =========================================================
-   STARDUST GENERATE BUTTON
-   ========================================================= */
+STARDUST GENERATE BUTTON
+========================================================= */
 
 .generate-button {
   --bg: #0a1929;
@@ -335,7 +326,6 @@ input {
     0 0.8rem 1rem -0.6rem rgba(0, 0, 0, 0.8);
 }
 
-
 /* Stardust glow */
 
 .generate-button::before {
@@ -357,7 +347,6 @@ input {
 
   z-index: -1;
 }
-
 
 /* Top highlight */
 
@@ -391,7 +380,6 @@ input {
   z-index: -1;
 }
 
-
 /* Hover */
 
 .generate-button:hover {
@@ -415,7 +403,6 @@ input {
   transform: translateY(5%);
 }
 
-
 /* Click */
 
 .generate-button:active {
@@ -428,10 +415,9 @@ input {
     0 1.5rem 2rem rgba(0, 0, 0, 0.3);
 }
 
-
 /* =========================================================
-   PREVIEW SECTION
-   ========================================================= */
+PREVIEW SECTION
+========================================================= */
 
 .preview-section {
   padding: 30px;
@@ -444,27 +430,23 @@ input {
 
   box-shadow:
     0 20px 50px rgba(0, 0, 0, 0.3);
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
 }
-
-.preview-section > h2 {
-  margin-top: 0;
-  margin-bottom: 25px;
-
-  color: white;
-
-  font-size: 24px;
-}
-
 
 /* =========================================================
-   BUILDER CARD
-   ========================================================= */
+BUILDER CARD
+========================================================= */
 
 .builder-card {
   width: 100%;
   max-width: 390px;
 
-  min-height: 500px;
+  aspect-ratio: 4 / 5;
 
   margin: 0 auto;
 
@@ -478,43 +460,63 @@ input {
 
   text-align: center;
 
-  background:
-    radial-gradient(
-      circle at top,
-      rgba(80, 190, 255, 0.15),
-      transparent 40%
-    ),
-    #171717;
+  background-image: url("/goa-card/goa-background.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 
   border: 1px solid #3b3b3b;
 
   border-radius: 24px;
 
-  box-shadow:
-    0 25px 60px rgba(0, 0, 0, 0.4);
+  box-sizing: border-box;
 }
 
-
 /* =========================================================
-   CARD TITLE
-   ========================================================= */
+CARD TITLE
+========================================================= */
 
 .card-event-title {
-  margin: 0 0 25px;
+  margin: 35px 0 25px;
 
-  font-size: 22px;
+  padding: 0;
 
-  color: #81d8ff;
+  font-size: 40px;
+  font-weight: 900;
+
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+
+  letter-spacing: 1px;
+
+  color: white;
+
+  -webkit-text-stroke: 1.5px #000000;
+
+  background: transparent;
+
+  border: none;
+
+  box-shadow: none;
+
+  text-align: center;
+
+  text-shadow:
+    0 0 5px rgba(255, 255, 255, 0.9),
+    0 0 10px rgba(129, 216, 255, 0.8),
+    0 0 18px rgba(129, 216, 255, 0.5);
+
+  transition: text-shadow 0.3s ease;
 }
 
-
 /* =========================================================
-   CARD PHOTO
-   ========================================================= */
+CARD PHOTO
+========================================================= */
 
 .card-photo {
-  width: 150px;
-  height: 150px;
+  width: 220px;
+  height: 320px;
+
+  margin-top: 10px;
 
   display: flex;
 
@@ -523,7 +525,7 @@ input {
 
   overflow: hidden;
 
-  border-radius: 50%;
+  border-radius: 8%;
 
   border: 3px solid #81d8ff;
 
@@ -542,51 +544,84 @@ input {
   object-fit: cover;
 }
 
-
 /* =========================================================
-   CARD NAME
-   ========================================================= */
+CARD INFORMATION BOX
+========================================================= */
 
 .card-name {
-  margin: 25px 0 8px;
+  width: 80%;
 
-  font-size: 27px;
+  margin: 25px 0 0;
 
-  color: white;
+  padding: 18px 20px 5px;
+
+  background: rgba(255, 248, 230, 0.92);
+
+  border: 1px solid rgba(129, 216, 255, 0.25);
+
+  border-bottom: none;
+
+  border-radius: 16px 16px 0 0;
+
+  color: #17324d;
+
+  font-size: 23px;
+  font-weight: 700;
+
+  box-sizing: border-box;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
 }
-
-
-/* =========================================================
-   CARD ROLE
-   ========================================================= */
 
 .card-role {
-  margin: 0 0 12px;
+  width: 80%;
 
-  color: #81d8ff;
-
-  font-size: 16px;
-
-  font-weight: 600;
-}
-
-
-/* =========================================================
-   CARD TECH STACK
-   ========================================================= */
-
-.card-stack {
   margin: 0;
 
-  color: #b5b5b5;
+  padding: 5px 20px;
 
-  font-size: 14px;
+  background: rgba(255, 248, 230, 0.92);
+
+  border-left: 1px solid rgba(129, 216, 255, 0.25);
+  border-right: 1px solid rgba(129, 216, 255, 0.25);
+
+  color: #176b8c;
+
+  font-size: 18px;
+
+  font-weight: 600;
+
+  box-sizing: border-box;
 }
 
+.card-stack {
+  width: 80%;
+
+  margin: 0;
+
+  padding: 8px 20px 18px;
+
+  background: rgba(255, 248, 230, 0.92);
+
+  border: 1px solid rgba(129, 216, 255, 0.25);
+
+  border-top: none;
+
+  border-radius: 0 0 16px 16px;
+
+  color: #3f4f5a;
+
+  font-size: 18px;
+
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+}
 
 /* =========================================================
-   CARD FOOTER
-   ========================================================= */
+CARD FOOTER
+========================================================= */
 
 .card-footer {
   width: 100%;
@@ -604,13 +639,11 @@ input {
   border-top: 1px solid #303030;
 }
 
-
 /* =========================================================
-   RESPONSIVE — TABLET
-   ========================================================= */
+RESPONSIVE — TABLET
+========================================================= */
 
 @media (max-width: 850px) {
-
   .main-container {
     grid-template-columns: 1fr;
 
@@ -628,13 +661,11 @@ input {
   }
 }
 
-
 /* =========================================================
-   RESPONSIVE — MOBILE
-   ========================================================= */
+RESPONSIVE — MOBILE
+========================================================= */
 
 @media (max-width: 600px) {
-
   .header {
     padding-top: 30px;
   }
@@ -680,4 +711,45 @@ input {
 
     padding: 16px 28px;
   }
+}
+/* ================================
+   CARD PHOTO
+   ================================ */
+
+/* ================================
+   CARD PHOTO
+   ================================ */
+
+#builder-card .card-photo {
+  width: 190px !important;
+  height: 180px !important;
+
+  min-width: 190px !important;
+  min-height: 180px !important;
+  max-width: 190px !important;
+  max-height: 180px !important;
+
+  /* Move photo closer to HH GOA 2026 title */
+  margin-top: 0px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+
+  border-radius: 12px;
+  border: 3px solid #81d8ff;
+  background: #262626;
+  color: #888;
+
+  aspect-ratio: auto !important;
+  flex-shrink: 0 !important;
+}
+
+#builder-card .card-photo img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
 }
