@@ -76,15 +76,21 @@ export default async function handler(req, res) {
   />
 
   <style>
+
+    html,
     body {
       margin: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      padding: 0;
+      min-height: 100%;
       background: #111;
       font-family: Arial, sans-serif;
       color: white;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       text-align: center;
     }
 
@@ -95,21 +101,23 @@ export default async function handler(req, res) {
       box-sizing: border-box;
     }
 
-    img {
+    .card-image {
       width: 100%;
       max-width: 540px;
+      height: auto;
       display: block;
       margin: 0 auto 25px;
       border-radius: 16px;
     }
 
     h1 {
-      margin-bottom: 10px;
+      margin: 10px 0;
     }
 
     p {
       opacity: 0.8;
     }
+
   </style>
 
 </head>
@@ -119,6 +127,7 @@ export default async function handler(req, res) {
   <div class="container">
 
     <img
+      class="card-image"
       src="${safeImageUrl}"
       alt="HH GOA 2026 Builder Card"
     />
@@ -140,7 +149,7 @@ export default async function handler(req, res) {
 
   res.setHeader(
     "Cache-Control",
-    "public, max-age=31536000, immutable"
+    "no-store"
   );
 
   return res.status(200).send(html);
