@@ -103,7 +103,8 @@ function App() {
 
     const targetWidth = 1080;
 
-    const scale = targetWidth / rect.width;
+    const scale =
+      targetWidth / rect.width;
 
     const canvas = await html2canvas(
       card,
@@ -121,10 +122,12 @@ function App() {
         logging: false,
 
         windowWidth:
-          document.documentElement.clientWidth,
+          document.documentElement
+            .clientWidth,
 
         windowHeight:
-          document.documentElement.clientHeight,
+          document.documentElement
+            .clientHeight,
       }
     );
 
@@ -140,6 +143,12 @@ function App() {
 
     const ctx =
       outputCanvas.getContext("2d");
+
+    if (!ctx) {
+      throw new Error(
+        "Could not create canvas context."
+      );
+    }
 
     ctx.imageSmoothingEnabled = true;
 
@@ -214,7 +223,8 @@ function App() {
       );
 
       setError(
-        "Could not generate the card. Please try again."
+        error?.message ||
+          "Could not generate the card. Please try again."
       );
     }
   };
@@ -277,22 +287,41 @@ function App() {
       }
     );
 
-    if (!response.ok) {
-      const message =
-        await response.text();
+    const responseText =
+      await response.text();
 
+    console.log(
+      "Upload status:",
+      response.status
+    );
+
+    console.log(
+      "Upload response:",
+      responseText
+    );
+
+    if (!response.ok) {
       throw new Error(
-        message ||
-          "Card upload failed."
+        `Upload failed (${response.status}): ${responseText}`
       );
     }
 
-    const data =
-      await response.json();
+    let data;
+
+    try {
+      data = JSON.parse(
+        responseText
+      );
+    } catch {
+      throw new Error(
+        "Upload API returned an invalid response: " +
+          responseText
+      );
+    }
 
     if (!data.url) {
       throw new Error(
-        "Upload did not return an image URL."
+        "Upload API did not return an image URL."
       );
     }
 
@@ -306,14 +335,14 @@ function App() {
   //
   // Generate PNG
   //      ↓
-  // Upload PNG to Vercel Blob
+  // Upload PNG
   //      ↓
-  // Get DIRECT PNG URL
+  // Create preview page
   //      ↓
-  // Open X composer
+  // Open X
   //
-  // The shared URL is now the actual
-  // PNG image URL.
+  // Caption:
+  // HH GOA 2026 #FrameInGoa
   // ==========================================
 
   const shareToX = async () => {
@@ -334,7 +363,7 @@ function App() {
         await createCardCanvas();
 
       // --------------------------------------
-      // Convert canvas to PNG file
+      // Convert to PNG
       // --------------------------------------
 
       const file =
@@ -343,21 +372,30 @@ function App() {
         );
 
       // --------------------------------------
-      // Upload PNG to Vercel Blob
+      // Upload PNG
       // --------------------------------------
 
       const imageUrl =
         await uploadCard(file);
 
+      console.log(
+        "Uploaded image URL:",
+        imageUrl
+      );
+
       // --------------------------------------
-      // IMPORTANT:
-      // Use the DIRECT PNG URL.
-      //
-      // Do NOT use:
-      // /api/share-card?image=...
+      // Create server-rendered preview page
       // --------------------------------------
 
-      const sharePage = imageUrl;
+      const sharePage =
+        `${window.location.origin}/api/share-card?image=${encodeURIComponent(
+          imageUrl
+        )}`;
+
+      console.log(
+        "Share page:",
+        sharePage
+      );
 
       // --------------------------------------
       // REQUIRED X CAPTION
@@ -367,21 +405,21 @@ function App() {
         "HH GOA 2026 #FrameInGoa";
 
       // --------------------------------------
-      // Put caption + direct PNG URL
-      // into X composer
+      // Put caption + preview page into X
       // --------------------------------------
 
       const xText =
         `${caption}\n\n${sharePage}`;
 
-      // --------------------------------------
-      // X POST URL
-      // --------------------------------------
-
       const xURL =
         `https://x.com/intent/post?text=${encodeURIComponent(
           xText
         )}`;
+
+      console.log(
+        "X URL:",
+        xURL
+      );
 
       // --------------------------------------
       // Open X composer
@@ -402,8 +440,12 @@ function App() {
 
       setSharing(false);
 
+      // Show the REAL error instead of
+      // hiding it behind a generic message.
+
       setError(
-        "Could not prepare the card for sharing. Please try again."
+        error?.message ||
+          "Could not prepare the card for sharing."
       );
     }
   };
@@ -415,9 +457,7 @@ function App() {
   return (
     <div className="app">
 
-      {/* ====================================
-          HEADER
-      ===================================== */}
+      {/* HEADER */}
 
       <header className="header">
 
@@ -458,17 +498,7 @@ function App() {
               <input
                 type="file"
 
-                accept="
-                  .jpg,
-                  .jpeg,
-                  .png,
-                  .heic,
-                  .heif,
-                  image/jpeg,
-                  image/png,
-                  image/heic,
-                  image/heif
-                "
+                accept=".jpg,.jpeg,.png,.heic,.heif,image/jpeg,image/png,image/heic,image/heif"
 
                 onChange={
                   handlePhotoUpload
@@ -485,6 +515,7 @@ function App() {
                   color: "red",
                   marginTop: "10px",
                   fontSize: "14px",
+                  wordBreak: "break-word",
                 }}
               >
                 {error}
@@ -561,6 +592,7 @@ function App() {
                   event.target.value
                 )
               }
+
             />
 
           </label>
@@ -571,12 +603,8 @@ function App() {
 
             <button
               className="generate-button"
-
               type="button"
-
-              onClick={
-                downloadCard
-              }
+              onClick={downloadCard}
             >
               Generate Card
             </button>
@@ -587,7 +615,6 @@ function App() {
 
           <div
             className="generate-button-wrapper"
-
             style={{
               marginTop: "18px",
             }}
@@ -595,13 +622,8 @@ function App() {
 
             <button
               className="share-button"
-
               type="button"
-
-              onClick={
-                shareToX
-              }
-
+              onClick={shareToX}
               disabled={sharing}
             >
 
@@ -629,7 +651,6 @@ function App() {
 
           <div
             className="builder-card"
-
             id="builder-card"
           >
 
@@ -651,7 +672,6 @@ function App() {
 
                 <img
                   src={photo}
-
                   alt="Builder"
                 />
 
