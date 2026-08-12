@@ -77,7 +77,6 @@ function App() {
       );
     }
 
-    // Wait for all images to load
     const images = card.querySelectorAll("img");
 
     await Promise.all(
@@ -306,7 +305,7 @@ function App() {
               "image/png",
           },
 
-          body: file,
+          body: file
         }
       );
 
@@ -354,15 +353,6 @@ function App() {
 
   // ==========================================
   // SHARE TO X
-  //
-  // IMPORTANT:
-  // The X tab is opened IMMEDIATELY when the
-  // user clicks the button. This prevents
-  // Chrome from blocking the popup.
-  //
-  // Then we generate and upload the card.
-  // Finally, the already-open tab is sent
-  // to the X composer.
   // ==========================================
 
   const shareToX = async () => {
@@ -379,9 +369,6 @@ function App() {
         "about:blank",
         "_blank"
       );
-
-    // Chrome may still block the popup if
-    // popups are disabled for this website.
 
     if (!xWindow) {
       setError(
@@ -427,16 +414,20 @@ function App() {
       );
 
       // ======================================
-      // CREATE PREVIEW PAGE
+      // IMPORTANT:
+      // ALWAYS USE PRODUCTION DOMAIN
       // ======================================
 
+      const productionDomain =
+        "https://hh-goa-builder-card-generator-two.vercel.app";
+
       const sharePage =
-        `${window.location.origin}/api/share-card?image=${encodeURIComponent(
+        `${productionDomain}/api/share-card?image=${encodeURIComponent(
           imageUrl
         )}`;
 
       console.log(
-        "Share page:",
+        "Production share page:",
         sharePage
       );
 
@@ -483,7 +474,6 @@ function App() {
         error
       );
 
-      // Close blank tab if something failed.
       try {
         xWindow.close();
       } catch {
@@ -492,7 +482,6 @@ function App() {
 
       setSharing(false);
 
-      // Show the REAL error.
       setError(
         error?.message ||
           "Could not prepare the card for sharing."
