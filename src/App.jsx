@@ -141,12 +141,6 @@ function App() {
     const ctx =
       outputCanvas.getContext("2d");
 
-    if (!ctx) {
-      throw new Error(
-        "Could not create canvas context."
-      );
-    }
-
     ctx.imageSmoothingEnabled = true;
 
     ctx.imageSmoothingQuality = "high";
@@ -213,7 +207,6 @@ function App() {
 
         1
       );
-
     } catch (error) {
       console.error(
         "Could not download card:",
@@ -309,34 +302,22 @@ function App() {
   // ==========================================
   // SHARE TO X
   //
-  // IMPORTANT:
-  // The X window is opened immediately from
-  // the button click before any await operation.
+  // Flow:
   //
-  // This prevents Chrome from blocking the
-  // popup because of the asynchronous upload.
+  // Generate PNG
+  //      ↓
+  // Upload PNG to Vercel Blob
+  //      ↓
+  // Get DIRECT PNG URL
+  //      ↓
+  // Open X composer
+  //
+  // The shared URL is now the actual
+  // PNG image URL.
   // ==========================================
 
   const shareToX = async () => {
     if (sharing) {
-      return;
-    }
-
-    // ========================================
-    // OPEN WINDOW IMMEDIATELY
-    // ========================================
-
-    const xWindow = window.open(
-      "about:blank",
-      "_blank"
-    );
-
-    // Popup was blocked
-    if (!xWindow) {
-      setError(
-        "Please allow pop-ups for this website and try again."
-      );
-
       return;
     }
 
@@ -345,98 +326,85 @@ function App() {
 
       setSharing(true);
 
-      // ======================================
-      // 1. GENERATE FINAL CARD
-      // ======================================
+      // --------------------------------------
+      // Generate final card
+      // --------------------------------------
 
       const outputCanvas =
         await createCardCanvas();
 
-      // ======================================
-      // 2. CONVERT CANVAS TO PNG
-      // ======================================
+      // --------------------------------------
+      // Convert canvas to PNG file
+      // --------------------------------------
 
       const file =
         await canvasToFile(
           outputCanvas
         );
 
-      // ======================================
-      // 3. UPLOAD PNG TO VERCEL BLOB
-      // ======================================
+      // --------------------------------------
+      // Upload PNG to Vercel Blob
+      // --------------------------------------
 
       const imageUrl =
         await uploadCard(file);
 
-      console.log(
-        "Uploaded card:",
-        imageUrl
-      );
+      // --------------------------------------
+      // IMPORTANT:
+      // Use the DIRECT PNG URL.
+      //
+      // Do NOT use:
+      // /api/share-card?image=...
+      // --------------------------------------
 
-      // ======================================
-      // 4. CREATE SHARE PREVIEW PAGE
-      // ======================================
+      const sharePage = imageUrl;
 
-      const sharePage =
-        `${window.location.origin}/api/share-card?image=${encodeURIComponent(
-          imageUrl
-        )}`;
-
-      console.log(
-        "Share page:",
-        sharePage
-      );
-
-      // ======================================
-      // 5. X CAPTION
-      // ======================================
+      // --------------------------------------
+      // REQUIRED X CAPTION
+      // --------------------------------------
 
       const caption =
         "HH GOA 2026 #FrameInGoa";
 
-      // ======================================
-      // 6. CREATE X POST URL
-      // ======================================
+      // --------------------------------------
+      // Put caption + direct PNG URL
+      // into X composer
+      // --------------------------------------
 
       const xText =
         `${caption}\n\n${sharePage}`;
+
+      // --------------------------------------
+      // X POST URL
+      // --------------------------------------
 
       const xURL =
         `https://x.com/intent/post?text=${encodeURIComponent(
           xText
         )}`;
 
-      console.log(
-        "X URL:",
-        xURL
+      // --------------------------------------
+      // Open X composer
+      // --------------------------------------
+
+      window.open(
+        xURL,
+        "_blank",
+        "noopener,noreferrer"
       );
 
-      // ======================================
-      // 7. NAVIGATE ALREADY-OPEN WINDOW
-      // ======================================
-
-      xWindow.location.href = xURL;
-
+      setSharing(false);
     } catch (error) {
       console.error(
         "Could not share card:",
         error
       );
 
-      // Close blank tab if something failed
-      try {
-        xWindow.close();
-      } catch {
-        // Ignore close errors
-      }
+      setSharing(false);
 
       setError(
-        error?.message ||
-          "Could not prepare the card for sharing. Please try again."
+        "Could not prepare the card for sharing. Please try again."
       );
-
-    } finally {
-      setSharing(false);
     }
   };
 
@@ -447,9 +415,9 @@ function App() {
   return (
     <div className="app">
 
-      {/* =====================================
+      {/* ====================================
           HEADER
-      ====================================== */}
+      ===================================== */}
 
       <header className="header">
 
@@ -465,9 +433,9 @@ function App() {
 
       <main className="main-container">
 
-        {/* ===================================
+        {/* ====================================
             LEFT SIDE
-        ==================================== */}
+        ===================================== */}
 
         <section className="input-section">
 
@@ -475,9 +443,7 @@ function App() {
             Create your Builder Card
           </h2>
 
-          {/* =================================
-              PHOTO UPLOAD
-          ================================== */}
+          {/* PHOTO UPLOAD */}
 
           <div className="upload-box">
 
@@ -527,9 +493,7 @@ function App() {
 
           </div>
 
-          {/* =================================
-              NAME
-          ================================== */}
+          {/* NAME */}
 
           <label>
 
@@ -553,9 +517,7 @@ function App() {
 
           </label>
 
-          {/* =================================
-              ROLE
-          ================================== */}
+          {/* ROLE */}
 
           <label>
 
@@ -579,9 +541,7 @@ function App() {
 
           </label>
 
-          {/* =================================
-              TECH STACK
-          ================================== */}
+          {/* TECH STACK */}
 
           <label>
 
@@ -605,28 +565,29 @@ function App() {
 
           </label>
 
-          {/* =================================
-              GENERATE BUTTON
-          ================================== */}
+          {/* GENERATE BUTTON */}
 
           <div className="generate-button-wrapper">
 
             <button
               className="generate-button"
+
               type="button"
-              onClick={downloadCard}
+
+              onClick={
+                downloadCard
+              }
             >
               Generate Card
             </button>
 
           </div>
 
-          {/* =================================
-              SHARE TO X BUTTON
-          ================================== */}
+          {/* SHARE BUTTON */}
 
           <div
             className="generate-button-wrapper"
+
             style={{
               marginTop: "18px",
             }}
@@ -634,8 +595,13 @@ function App() {
 
             <button
               className="share-button"
+
               type="button"
-              onClick={shareToX}
+
+              onClick={
+                shareToX
+              }
+
               disabled={sharing}
             >
 
@@ -649,9 +615,9 @@ function App() {
 
         </section>
 
-        {/* ===================================
+        {/* ====================================
             RIGHT SIDE
-        ==================================== */}
+        ===================================== */}
 
         <section className="preview-section">
 
@@ -659,18 +625,15 @@ function App() {
             Preview
           </h2>
 
-          {/* =================================
-              BUILDER CARD
-          ================================== */}
+          {/* BUILDER CARD */}
 
           <div
             className="builder-card"
+
             id="builder-card"
           >
 
-            {/* ===============================
-                EVENT TITLE
-            ================================ */}
+            {/* EVENT TITLE */}
 
             <h2
               className="card-event-title"
@@ -678,9 +641,7 @@ function App() {
               HH GOA 2026
             </h2>
 
-            {/* ===============================
-                PHOTO
-            ================================ */}
+            {/* PHOTO */}
 
             <div
               className="card-photo"
@@ -690,6 +651,7 @@ function App() {
 
                 <img
                   src={photo}
+
                   alt="Builder"
                 />
 
@@ -703,9 +665,7 @@ function App() {
 
             </div>
 
-            {/* ===============================
-                NAME
-            ================================ */}
+            {/* NAME */}
 
             <h3
               className="card-name"
@@ -714,9 +674,7 @@ function App() {
                 "Your Name"}
             </h3>
 
-            {/* ===============================
-                ROLE
-            ================================ */}
+            {/* ROLE */}
 
             <p
               className="card-role"
@@ -725,9 +683,7 @@ function App() {
                 "Frontend Developer"}
             </p>
 
-            {/* ===============================
-                TECH STACK
-            ================================ */}
+            {/* TECH STACK */}
 
             <p
               className="card-stack"
@@ -736,9 +692,7 @@ function App() {
                 "React • JavaScript"}
             </p>
 
-            {/* ===============================
-                FOOTER
-            ================================ */}
+            {/* FOOTER */}
 
             <div
               className="card-footer"
