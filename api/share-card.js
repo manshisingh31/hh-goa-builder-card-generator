@@ -3,36 +3,110 @@ export default async function handler(req, res) {
     const imageUrl = req.query.image;
 
     if (!imageUrl) {
-      return res.status(400).send("Missing image");
+      return res.status(400).send(
+        "Missing image"
+      );
     }
 
-    const decodedImageUrl = decodeURIComponent(
-      String(imageUrl)
-    );
+    const decodedImageUrl =
+      decodeURIComponent(
+        String(imageUrl)
+      );
 
-    // Only allow HTTPS image URLs.
-    if (!decodedImageUrl.startsWith("https://")) {
-      return res.status(400).send("Invalid image URL");
+    // Validate the original Blob URL.
+    let parsedImageUrl;
+
+    try {
+      parsedImageUrl =
+        new URL(decodedImageUrl);
+    } catch {
+      return res.status(400).send(
+        "Invalid image URL"
+      );
     }
 
-    // Escape HTML-sensitive characters.
-    const safeImageUrl = decodedImageUrl
-      .replace(/&/g, "&amp;")
-      .replace(/"/g, "&quot;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+    // Only HTTPS.
+    if (
+      parsedImageUrl.protocol !==
+      "https:"
+    ) {
+      return res.status(400).send(
+        "Invalid image URL"
+      );
+    }
+
+    // Only allow our Vercel Blob storage.
+    if (
+      !parsedImageUrl.hostname.endsWith(
+        ".public.blob.vercel-storage.com"
+      )
+    ) {
+      return res.status(400).send(
+        "Image host not allowed"
+      );
+    }
+
+    // ==========================================
+    // PRODUCTION DOMAIN
+    // ==========================================
+
+    const host =
+      req.headers.host;
+
+    const protocol =
+      req.headers["x-forwarded-proto"] ||
+      "https";
+
+    const origin =
+      `${protocol}://${host}`;
+
+    // ==========================================
+    // PROXY IMAGE URL
+    //
+    // X will request this URL as og:image.
+    //
+    // Instead of asking X to directly fetch the
+    // Vercel Blob URL, we serve the PNG through
+    // our own API endpoint.
+    // ==========================================
+
+    const proxyImageUrl =
+      `${origin}/api/card-image?image=${encodeURIComponent(
+        decodedImageUrl
+      )}`;
+
+    // ==========================================
+    // CURRENT SHARE PAGE URL
+    // ==========================================
 
     const pageUrl =
-      `https://${req.headers.host}${req.url}`;
+      `${origin}${req.url}`;
 
-    const safePageUrl = pageUrl
-      .replace(/&/g, "&amp;")
-      .replace(/"/g, "&quot;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+    // ==========================================
+    // HTML ESCAPING
+    // ==========================================
+
+    const safeProxyImageUrl =
+      proxyImageUrl
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+    const safePageUrl =
+      pageUrl
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+    // ==========================================
+    // SHARE PAGE HTML
+    // ==========================================
 
     const html = `<!DOCTYPE html>
 <html lang="en">
+
 <head>
 
   <meta charset="UTF-8">
@@ -44,7 +118,9 @@ export default async function handler(req, res) {
     content="HH GOA 2026 Builder Card #FrameInGoa"
   >
 
-  <!-- Open Graph -->
+  <!-- ===================================== -->
+  <!-- OPEN GRAPH -->
+  <!-- ===================================== -->
 
   <meta
     property="og:title"
@@ -68,12 +144,12 @@ export default async function handler(req, res) {
 
   <meta
     property="og:image"
-    content="${safeImageUrl}"
+    content="${safeProxyImageUrl}"
   >
 
   <meta
     property="og:image:secure_url"
-    content="${safeImageUrl}"
+    content="${safeProxyImageUrl}"
   >
 
   <meta
@@ -91,7 +167,9 @@ export default async function handler(req, res) {
     content="1350"
   >
 
-  <!-- X / Twitter -->
+  <!-- ===================================== -->
+  <!-- X / TWITTER -->
+  <!-- ===================================== -->
 
   <meta
     name="twitter:card"
@@ -110,7 +188,7 @@ export default async function handler(req, res) {
 
   <meta
     name="twitter:image"
-    content="${safeImageUrl}"
+    content="${safeProxyImageUrl}"
   >
 
   <meta
@@ -124,6 +202,7 @@ export default async function handler(req, res) {
   >
 
   <style>
+
     html,
     body {
       margin: 0;
@@ -164,6 +243,7 @@ export default async function handler(req, res) {
     p {
       opacity: 0.8;
     }
+
   </style>
 
 </head>
@@ -174,7 +254,7 @@ export default async function handler(req, res) {
 
     <img
       class="card-image"
-      src="${safeImageUrl}"
+      src="${safeProxyImageUrl}"
       alt="HH GOA 2026 Builder Card"
     >
 
@@ -189,9 +269,13 @@ export default async function handler(req, res) {
   </main>
 
 </body>
+
 </html>`;
 
-    // Important headers for social-media crawlers.
+    // ==========================================
+    // RESPONSE HEADERS
+    // ==========================================
+
     res.setHeader(
       "Content-Type",
       "text/html; charset=utf-8"
@@ -207,7 +291,9 @@ export default async function handler(req, res) {
       "nosniff"
     );
 
-    return res.status(200).send(html);
+    return res.status(200).send(
+      html
+    );
 
   } catch (error) {
     console.error(
