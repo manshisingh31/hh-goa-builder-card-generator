@@ -1,26 +1,21 @@
-/* =========================================================
-GLOBAL
-========================================================= */
-
 * {
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-
-  background: #0b0b0b;
-  color: white;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(255, 155, 90, 0.28), transparent 30%),
+    radial-gradient(circle at top right, rgba(82, 199, 255, 0.25), transparent 32%),
+    linear-gradient(135deg, #fff7ee 0%, #f7ecff 22%, #ecfbff 55%, #fef0ea 100%);
+  color: #1f2d3d;
 }
 
 button,
@@ -28,724 +23,527 @@ input {
   font-family: inherit;
 }
 
-.app {
-  min-height: 100vh;
-  padding-bottom: 60px;
+img {
+  display: block;
+  max-width: 100%;
 }
 
-/* =========================================================
-HEADER
-========================================================= */
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.app {
+  position: relative;
+  min-height: 100vh;
+  padding: 24px 20px 60px;
+  overflow: hidden;
+}
+
+.app::before,
+.app::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(12px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app::before {
+  width: 280px;
+  height: 280px;
+  top: -80px;
+  left: -50px;
+  background: rgba(255, 171, 108, 0.35);
+}
+
+.app::after {
+  width: 300px;
+  height: 300px;
+  right: -60px;
+  bottom: 30px;
+  background: rgba(115, 205, 255, 0.3);
+}
 
 .header {
+  position: relative;
+  z-index: 10;
   text-align: center;
-  padding: 45px 20px 30px;
+  padding: 26px 20px 18px;
 }
 
 .header h1 {
+  position: relative;
+  z-index: 12;
   margin: 0;
-
-  font-size: clamp(32px, 5vw, 52px);
-  font-weight: 800;
-
-  letter-spacing: -1px;
-
-  background: linear-gradient(
-    90deg,
-    #ffffff,
-    #81d8ff,
-    #ffffff
-  );
-
+  font-size: clamp(2.8rem, 6vw, 6rem);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.08em;
+  background: linear-gradient(135deg, #ff9b5d 0%, #ff5ebc 26%, #6fd0ff 57%, #7cf0c7 100%);
   -webkit-background-clip: text;
   background-clip: text;
-
   color: transparent;
+  text-shadow: 0 12px 30px rgba(255, 126, 88, 0.2);
 }
 
 .header p {
-  margin: 10px 0 0;
-
-  color: #a3a3a3;
-
-  font-size: 16px;
+  margin: 12px 0 0;
+  color: rgba(31, 45, 61, 0.72);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-/* =========================================================
-MAIN LAYOUT
-========================================================= */
-
 .main-container {
-  width: min(1150px, 92%);
-
+  position: relative;
+  z-index: 1;
+  width: min(1180px, 100%);
   margin: 0 auto;
-
   display: grid;
-
-  grid-template-columns:
-    minmax(300px, 1fr)
-    minmax(300px, 1fr);
-
-  gap: 45px;
-
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
   align-items: start;
 }
 
-/* =========================================================
-INPUT SECTION
-========================================================= */
+.input-section,
+.preview-section {
+  position: relative;
+  z-index: 1;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 30px;
+  box-shadow:
+    18px 18px 34px rgba(183, 146, 126, 0.18),
+    -12px -12px 24px rgba(255, 255, 255, 0.72),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(14px);
+}
 
 .input-section {
   padding: 30px;
-
-  background: #151515;
-
-  border: 1px solid #292929;
-
-  border-radius: 24px;
-
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.3);
 }
 
-.input-section h2 {
-  margin-top: 0;
-  margin-bottom: 25px;
-
-  color: white;
-
-  font-size: 24px;
+.input-section h2,
+.preview-section h2 {
+  margin: 0 0 22px;
+  font-size: clamp(1.5rem, 2vw, 2.1rem);
+  line-height: 1.2;
+  color: #1e2d46;
+  letter-spacing: -0.04em;
 }
-
-/* =========================================================
-PHOTO UPLOAD
-========================================================= */
 
 .upload-box {
-  margin-bottom: 25px;
-
-  padding: 28px;
-
+  margin-bottom: 24px;
+  padding: 26px 18px;
   text-align: center;
-
-  background:
-    radial-gradient(
-      circle at top,
-      rgba(129, 216, 255, 0.08),
-      transparent 65%
-    ),
-    #101010;
-
-  border: 1px dashed rgba(129, 216, 255, 0.35);
-
-  border-radius: 18px;
-
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.66), rgba(232, 244, 255, 0.8));
+  border: 2px dashed rgba(77, 160, 255, 0.45);
+  border-radius: 22px;
   box-shadow:
-    inset 0 0 25px rgba(129, 216, 255, 0.03),
-    0 10px 30px rgba(0, 0, 0, 0.2);
-
-  transition:
-    border-color 0.3s ease,
-    box-shadow 0.3s ease;
+    inset 6px 6px 14px rgba(255, 255, 255, 0.75),
+    inset -8px -8px 16px rgba(173, 217, 255, 0.24);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .upload-box:hover {
-  border-color: rgba(129, 216, 255, 0.65);
-
+  transform: translateY(-1px);
   box-shadow:
-    inset 0 0 25px rgba(129, 216, 255, 0.05),
-    0 10px 35px rgba(0, 0, 0, 0.3);
+    inset 6px 6px 14px rgba(255, 255, 255, 0.75),
+    inset -8px -8px 16px rgba(173, 217, 255, 0.3),
+    0 10px 25px rgba(95, 148, 209, 0.14);
 }
 
 .upload-box p {
-  margin-top: 0;
-  margin-bottom: 18px;
-
-  color: #bdbdbd;
-
-  font-size: 15px;
+  margin: 0 0 18px;
+  color: #3a4c63;
+  font-size: 0.98rem;
+  font-weight: 700;
 }
-
-/* =========================================================
-CHOOSE PHOTO BUTTON
-========================================================= */
 
 .upload-button {
   display: inline-block;
-
-  padding: 11px 22px;
-
-  background: #171717;
-
-  color: #81d8ff;
-
-  border: 1px solid #3a5968;
-
-  border-radius: 10px;
-
+  padding: 12px 22px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7ad8ff 0%, #5ea7ff 50%, #ff8daa 100%);
+  color: #fff;
   cursor: pointer;
-
-  font-size: 14px;
-  font-weight: 600;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  font-size: 0.92rem;
+  font-weight: 800;
+  box-shadow:
+    10px 10px 20px rgba(139, 170, 220, 0.22),
+    -6px -6px 14px rgba(255, 255, 255, 0.7);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .upload-button:hover {
-  background: #1d2a31;
-
-  border-color: #81d8ff;
-
-  transform: translateY(-1px);
-
+  transform: translateY(-2px);
   box-shadow:
-    0 0 15px rgba(129, 216, 255, 0.12);
+    12px 12px 22px rgba(139, 170, 220, 0.26),
+    -7px -7px 15px rgba(255, 255, 255, 0.72);
 }
 
 .upload-button:active {
   transform: translateY(1px);
 }
 
-/* =========================================================
-FORM LABELS
-========================================================= */
-
 .input-section > label {
   display: block;
-
   margin-bottom: 20px;
 }
 
 .input-section > label span {
   display: block;
-
   margin-bottom: 8px;
-
-  color: #d6d6d6;
-
-  font-size: 14px;
-  font-weight: 600;
+  color: #2d3f5f;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
-
-/* =========================================================
-TEXT INPUTS
-========================================================= */
 
 .input-section > label input[type="text"] {
   width: 100%;
-
-  padding: 14px 16px;
-
-  background: #0d0d0d;
-
-  color: white;
-
-  border: 1px solid #3a3a3a;
-
-  border-radius: 12px;
-
+  padding: 15px 16px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #1b2741;
+  border: 1px solid rgba(122, 163, 233, 0.18);
+  border-radius: 16px;
   outline: none;
-
-  font-size: 15px;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+  font-size: 1rem;
+  box-shadow:
+    inset 8px 8px 18px rgba(190, 208, 234, 0.16),
+    inset -6px -6px 16px rgba(255, 255, 255, 0.7);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .input-section > label input[type="text"]::placeholder {
-  color: #707070;
+  color: rgba(62, 86, 118, 0.65);
 }
 
 .input-section > label input[type="text"]:focus {
-  border-color: #81d8ff;
-
+  border-color: rgba(106, 151, 255, 0.6);
   box-shadow:
-    0 0 0 3px rgba(129, 216, 255, 0.1);
+    0 0 0 4px rgba(106, 151, 255, 0.14),
+    inset 8px 8px 18px rgba(190, 208, 234, 0.2),
+    inset -6px -6px 16px rgba(255, 255, 255, 0.8);
 }
-
-/* =========================================================
-GENERATE BUTTON WRAPPER
-========================================================= */
 
 .generate-button-wrapper {
   display: flex;
-
   justify-content: center;
   align-items: center;
-
-  margin-top: 30px;
+  margin-top: 28px;
 }
 
-/* =========================================================
-STARDUST GENERATE BUTTON
-========================================================= */
+.generate-button,
+.share-button {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff9e63 0%, #ff6ec8 34%, #6ed4ff 68%, #7af0d1 100%);
+  box-shadow:
+    12px 12px 24px rgba(189, 135, 103, 0.22),
+    -8px -8px 20px rgba(255, 255, 255, 0.75),
+    inset 2px 2px 8px rgba(255, 255, 255, 0.6),
+    inset -2px -4px 12px rgba(102, 58, 145, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.generate-button:hover,
+.share-button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    14px 14px 28px rgba(189, 135, 103, 0.25),
+    -9px -9px 22px rgba(255, 255, 255, 0.8),
+    inset 2px 2px 10px rgba(255, 255, 255, 0.7),
+    inset -2px -4px 12px rgba(102, 58, 145, 0.2);
+}
+
+.generate-button:active,
+.share-button:active {
+  transform: translateY(1px);
+}
 
 .generate-button {
-  --bg: #0a1929;
-  --radius: 100px;
-
-  position: relative;
-
-  overflow: hidden;
-
-  border: 0;
-  outline: none;
-
-  cursor: pointer;
-
-  border-radius: var(--radius);
-
-  background-color: var(--bg);
-
-  color: rgba(129, 216, 255, 0.95);
-
-  font-size: 18px;
-  font-weight: 600;
-
-  padding: 18px 34px;
-
-  text-shadow:
-    0 0 8px rgba(129, 216, 255, 0.35);
-
-  isolation: isolate;
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.3s ease;
-
-  box-shadow:
-    inset 0 0.3rem 0.9rem rgba(255, 255, 255, 0.3),
-    inset 0 -0.1rem 0.3rem rgba(0, 0, 0, 0.7),
-    inset 0 -0.4rem 0.9rem rgba(255, 255, 255, 0.5),
-    0 1.5rem 2rem rgba(0, 0, 0, 0.3),
-    0 0.8rem 1rem -0.6rem rgba(0, 0, 0, 0.8);
+  padding: 18px 32px;
+  font-size: 1.05rem;
 }
 
-/* Stardust glow */
-
-.generate-button::before {
-  content: "";
-
-  position: absolute;
-
-  left: -15%;
-  right: -15%;
-
-  bottom: 25%;
-  top: -100%;
-
-  border-radius: 50%;
-
-  background-color: rgba(64, 180, 255, 0.15);
-
-  transition: transform 0.3s ease;
-
-  z-index: -1;
+.share-button {
+  padding: 16px 28px;
+  font-size: 1rem;
 }
-
-/* Top highlight */
-
-.generate-button::after {
-  content: "";
-
-  position: absolute;
-
-  left: 6%;
-  right: 6%;
-
-  top: 12%;
-  bottom: 40%;
-
-  border-radius: 22px 22px 0 0;
-
-  box-shadow:
-    inset 0 10px 8px -10px rgba(129, 216, 255, 0.6);
-
-  background: linear-gradient(
-    180deg,
-    rgba(64, 180, 255, 0.25) 0%,
-    rgba(0, 0, 0, 0) 50%,
-    rgba(0, 0, 0, 0) 100%
-  );
-
-  transition:
-    opacity 0.3s ease,
-    transform 0.3s ease;
-
-  z-index: -1;
-}
-
-/* Hover */
-
-.generate-button:hover {
-  transform: translateY(-2px);
-
-  box-shadow:
-    inset 0 0.3rem 0.5rem rgba(129, 216, 255, 0.4),
-    inset 0 -0.1rem 0.3rem rgba(0, 0, 0, 0.7),
-    inset 0 -0.4rem 0.9rem rgba(64, 180, 255, 0.6),
-    0 1.5rem 2rem rgba(0, 0, 0, 0.3),
-    0 0.8rem 1rem -0.6rem rgba(0, 0, 0, 0.8);
-}
-
-.generate-button:hover::before {
-  transform: translateY(-5%);
-}
-
-.generate-button:hover::after {
-  opacity: 0.4;
-
-  transform: translateY(5%);
-}
-
-/* Click */
-
-.generate-button:active {
-  transform: translateY(4px);
-
-  box-shadow:
-    inset 0 0.3rem 0.5rem rgba(129, 216, 255, 0.5),
-    inset 0 -0.1rem 0.3rem rgba(0, 0, 0, 0.8),
-    inset 0 -0.4rem 0.9rem rgba(64, 180, 255, 0.4),
-    0 1.5rem 2rem rgba(0, 0, 0, 0.3);
-}
-
-/* =========================================================
-PREVIEW SECTION
-========================================================= */
 
 .preview-section {
-  padding: 30px;
-
-  background: #151515;
-
-  border: 1px solid #292929;
-
-  border-radius: 24px;
-
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.3);
-
+  padding: 30px 22px 24px;
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
+  overflow: visible;
 }
 
-/* =========================================================
-BUILDER CARD
-========================================================= */
+.preview-section h2 {
+  align-self: flex-start;
+  margin-bottom: 18px;
+}
 
 .builder-card {
-  width: 100%;
-  max-width: 390px;
-
+  position: relative;
+  z-index: 1;
+  width: min(100%, 420px);
+  max-width: 420px;
   aspect-ratio: 4 / 5;
-
   margin: 0 auto;
-
-  padding: 30px;
-
+  padding: 30px 22px 18px;
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   text-align: center;
-
   background-image: url("/goa-card/goa-background.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-
-  border: 1px solid #3b3b3b;
-
-  border-radius: 24px;
-
+  border-radius: 28px;
+  box-shadow:
+    20px 20px 30px rgba(40, 55, 75, 0.2),
+    inset 1px 1px 0 rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   box-sizing: border-box;
 }
 
-/* =========================================================
-CARD TITLE
-========================================================= */
-
 .card-event-title {
-  margin: 35px 0 25px;
-
+  position: relative;
+  z-index: 2;
+  margin: 22px 0 18px;
   padding: 0;
-
-  font-size: 40px;
+  font-size: clamp(2.1rem, 3vw, 3.4rem);
   font-weight: 900;
-
   font-family: "Brush Script MT", "Segoe Script", cursive;
-
   letter-spacing: 1px;
-
   color: white;
-
   -webkit-text-stroke: 1.5px #000000;
-
   background: transparent;
-
   border: none;
-
   box-shadow: none;
-
   text-align: center;
-
+  line-height: 1;
   text-shadow:
     0 0 5px rgba(255, 255, 255, 0.9),
-    0 0 10px rgba(129, 216, 255, 0.8),
-    0 0 18px rgba(129, 216, 255, 0.5);
-
-  transition: text-shadow 0.3s ease;
+    0 0 12px rgba(93, 172, 255, 0.8),
+    0 0 24px rgba(255, 126, 88, 0.5);
 }
 
-/* =========================================================
-CARD PHOTO
-========================================================= */
-
 .card-photo {
-  width: 220px;
-  height: 320px;
-
-  margin-top: 10px;
-
+  position: relative;
+  z-index: 2;
+  width: 210px;
+  height: 250px;
+  margin-top: 6px;
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   overflow: hidden;
-
-  border-radius: 8%;
-
-  border: 3px solid #81d8ff;
-
-  background: #262626;
-
-  color: #888;
-
+  border-radius: 18px;
+  border: 3px solid rgba(114, 211, 255, 0.9);
+  background: linear-gradient(145deg, #dfeeff, #a5d8ff);
+  color: #6181a0;
   box-shadow:
-    0 0 25px rgba(129, 216, 255, 0.15);
+    0 10px 25px rgba(92, 162, 219, 0.18),
+    inset 3px 3px 9px rgba(255, 255, 255, 0.8),
+    inset -3px -3px 12px rgba(110, 149, 179, 0.18);
 }
 
 .card-photo img {
   width: 100%;
   height: 100%;
-
   object-fit: cover;
 }
 
-/* =========================================================
-CARD INFORMATION BOX
-========================================================= */
-
 .card-name {
-  width: 80%;
-
-  margin: 25px 0 0;
-
-  padding: 18px 20px 5px;
-
+  position: relative;
+  z-index: 2;
+  width: 82%;
+  margin: 22px 0 0;
+  padding: 18px 20px 6px;
   background: rgba(255, 248, 230, 0.92);
-
-  border: 1px solid rgba(129, 216, 255, 0.25);
-
+  border: 1px solid rgba(143, 211, 255, 0.26);
   border-bottom: none;
-
   border-radius: 16px 16px 0 0;
-
   color: #17324d;
-
-  font-size: 23px;
-  font-weight: 700;
-
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  font-weight: 800;
   box-sizing: border-box;
-
   overflow-wrap: anywhere;
   word-break: break-word;
-
 }
 
 .card-role {
-  width: 80%;
-
+  position: relative;
+  z-index: 2;
+  width: 82%;
   margin: 0;
-
-  padding: 5px 20px;
-
+  padding: 6px 20px;
   background: rgba(255, 248, 230, 0.92);
-
-  border-left: 1px solid rgba(129, 216, 255, 0.25);
-  border-right: 1px solid rgba(129, 216, 255, 0.25);
-
+  border-left: 1px solid rgba(143, 211, 255, 0.26);
+  border-right: 1px solid rgba(143, 211, 255, 0.26);
   color: #176b8c;
-
-  font-size: 18px;
-
-  font-weight: 600;
-
+  font-size: 1rem;
+  font-weight: 700;
   box-sizing: border-box;
 }
 
 .card-stack {
-  width: 80%;
-
+  position: relative;
+  z-index: 2;
+  width: 82%;
   margin: 0;
-
   padding: 8px 20px 18px;
-
   background: rgba(255, 248, 230, 0.92);
-
-  border: 1px solid rgba(129, 216, 255, 0.25);
-
+  border: 1px solid rgba(143, 211, 255, 0.26);
   border-top: none;
-
   border-radius: 0 0 16px 16px;
-
   color: #3f4f5a;
-
-  font-size: 18px;
-
+  font-size: 1rem;
   box-sizing: border-box;
   overflow-wrap: anywhere;
 }
 
-/* =========================================================
-CARD FOOTER
-========================================================= */
-
 .card-footer {
   width: 100%;
-
   margin-top: auto;
-
-  padding-top: 25px;
-
-  color: #666;
-
-  font-size: 12px;
-
-  letter-spacing: 1px;
-
-  border-top: 1px solid #303030;
+  padding-top: 18px;
+  color: rgba(28, 38, 53, 0.72);
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  border-top: 1px solid rgba(53, 67, 86, 0.18);
+  text-transform: uppercase;
 }
 
-/* =========================================================
-RESPONSIVE — TABLET
-========================================================= */
-
-@media (max-width: 850px) {
+@media (max-width: 980px) {
   .main-container {
     grid-template-columns: 1fr;
-
-    width: min(600px, 92%);
-
-    gap: 30px;
+    width: min(620px, 100%);
+    gap: 28px;
   }
 
-  .input-section {
-    order: 1;
+  .input-section,
+  .preview-section {
+    padding: 24px 20px;
   }
 
   .preview-section {
     order: 2;
   }
+
+  .builder-card {
+    max-width: 420px;
+    width: 100%;
+  }
 }
 
-/* =========================================================
-RESPONSIVE — MOBILE
-========================================================= */
+@media (max-width: 640px) {
+  .app {
+    padding: 18px 14px 48px;
+  }
 
-@media (max-width: 600px) {
   .header {
-    padding-top: 30px;
+    padding-top: 12px;
   }
 
   .header h1 {
-    font-size: 34px;
+    font-size: clamp(2.2rem, 11vw, 3.7rem);
+    line-height: 0.98;
+    letter-spacing: -0.07em;
+    position: relative;
+    z-index: 12;
   }
 
   .header p {
-    font-size: 14px;
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
   }
 
   .main-container {
-    width: 92%;
+    width: min(100%, 430px);
+    gap: 22px;
   }
 
   .input-section,
   .preview-section {
-    padding: 20px;
+    padding: 18px 16px;
+    border-radius: 24px;
   }
 
   .upload-box {
-    padding: 22px 15px;
+    padding: 20px 14px;
+  }
+
+  .generate-button,
+  .share-button {
+    width: 100%;
+    padding: 16px 24px;
   }
 
   .builder-card {
+    width: 100%;
+    max-width: 100%;
     min-height: 450px;
+    padding: 18px 14px 14px;
+  }
 
-    padding: 25px;
+  .card-event-title {
+    margin-top: 10px;
+    font-size: clamp(2rem, 9vw, 2.8rem);
   }
 
   .card-photo {
-    width: 125px;
-    height: 125px;
+    width: 150px;
+    height: 170px;
   }
 
   .card-name {
-    font-size: 23px;
+    width: 86%;
+    font-size: 1.35rem;
   }
 
-  .generate-button {
-    font-size: 16px;
-
-    padding: 16px 28px;
+  .card-role,
+  .card-stack {
+    width: 86%;
+    font-size: 0.92rem;
   }
 }
-/* ================================
-   CARD PHOTO
-   ================================ */
-
-/* ================================
-   CARD PHOTO
-   ================================ */
 
 #builder-card .card-photo {
   width: 190px !important;
   height: 180px !important;
-
   min-width: 190px !important;
   min-height: 180px !important;
   max-width: 190px !important;
   max-height: 180px !important;
-
-  /* Move photo closer to HH GOA 2026 title */
-  margin-top: 0px !important;
-
+  margin-top: 0 !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-
   overflow: hidden !important;
   box-sizing: border-box !important;
-
   border-radius: 12px;
-  border: 3px solid #81d8ff;
-  background: #262626;
-  color: #888;
-
+  border: 3px solid rgba(114, 211, 255, 0.9);
+  background: linear-gradient(145deg, #dfeeff, #a5d8ff);
+  color: #6181a0;
   aspect-ratio: auto !important;
   flex-shrink: 0 !important;
+  position: relative;
+  z-index: 2;
 }
 
 #builder-card .card-photo img {
