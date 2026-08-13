@@ -2,6 +2,7 @@
   box-sizing: border-box;
 }
 
+
 html {
   scroll-behavior: smooth;
 }
@@ -292,7 +293,6 @@ img {
 }
 
 .preview-section h2 {
-  align-self: flex-start;
   margin-bottom: 18px;
 }
 
@@ -303,7 +303,7 @@ img {
   max-width: 420px;
   aspect-ratio: 4 / 5;
   margin: 0 auto;
-  padding: 30px 22px 18px;
+  padding: 22px 20px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -313,9 +313,10 @@ img {
   background-position: center;
   background-repeat: no-repeat;
   border-radius: 28px;
-  box-shadow:
-    20px 20px 30px rgba(40, 55, 75, 0.2),
-    inset 1px 1px 0 rgba(255, 255, 255, 0.5);
+  /* No inset box-shadow here: html2canvas mis-renders inset shadows on
+     this element as a large translucent haze across the whole card
+     instead of a thin edge highlight, even though it looks fine live. */
+  box-shadow: 20px 20px 30px rgba(40, 55, 75, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-sizing: border-box;
 }
@@ -323,9 +324,9 @@ img {
 .card-event-title {
   position: relative;
   z-index: 2;
-  margin: 22px 0 18px;
+  margin: 8px 0 10px;
   padding: 0;
-  font-size: clamp(2.1rem, 3vw, 3.4rem);
+  font-size: clamp(1.9rem, 3vw, 3.1rem);
   font-weight: 900;
   font-family: "Brush Script MT", "Segoe Script", cursive;
   letter-spacing: 1px;
@@ -342,85 +343,136 @@ img {
     0 0 24px rgba(255, 126, 88, 0.5);
 }
 
-.card-photo {
+.card-photo-frame {
   position: relative;
   z-index: 2;
-  width: 210px;
-  height: 250px;
-  margin-top: 6px;
+  margin-top: 2px;
+}
+
+.card-photo {
+  width: 196px;
+  height: 210px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border-radius: 18px;
-  border: 3px solid rgba(114, 211, 255, 0.9);
-  background: linear-gradient(145deg, #dfeeff, #a5d8ff);
+  border-radius: 20px;
+  border: 6px solid #fff;
+  background: linear-gradient(145deg, #dfeeff, #ffe3cf);
   color: #6181a0;
+  box-sizing: border-box;
   box-shadow:
-    0 10px 25px rgba(92, 162, 219, 0.18),
-    inset 3px 3px 9px rgba(255, 255, 255, 0.8),
-    inset -3px -3px 12px rgba(110, 149, 179, 0.18);
+    0 0 0 3px rgba(93, 172, 255, 0.55),
+    0 16px 30px rgba(31, 45, 61, 0.28);
+}
+
+.card-photo span {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #6181a0;
 }
 
 .card-photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  touch-action: none;
+  user-select: none;
+}
+
+.card-photo-badge {
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffb648, #ff7a5c);
+  border: 3px solid #fff;
+  box-shadow: 0 8px 16px rgba(255, 122, 92, 0.35);
+}
+
+.card-photo-badge svg {
+  width: 22px;
+  height: 22px;
+}
+
+.card-name-ribbon {
+  position: relative;
+  z-index: 2;
+  max-width: 92%;
+  margin: 12px 0 0;
 }
 
 .card-name {
-  position: relative;
-  z-index: 2;
-  width: 82%;
-  margin: 22px 0 0;
-  padding: 18px 20px 6px;
-  background: rgba(255, 248, 230, 0.92);
-  border: 1px solid rgba(143, 211, 255, 0.26);
-  border-bottom: none;
-  border-radius: 16px 16px 0 0;
-  color: #17324d;
-  font-size: clamp(1.2rem, 2vw, 1.8rem);
+  margin: 0;
+  padding: 9px 24px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff9e63 0%, #ff6ec8 40%, #6ed4ff 75%, #7af0d1 100%);
+  color: #fff;
+  font-size: clamp(1.15rem, 2vw, 1.6rem);
   font-weight: 800;
-  box-sizing: border-box;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 10px 22px rgba(189, 135, 103, 0.32);
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
-.card-role {
+.card-fields {
   position: relative;
   z-index: 2;
-  width: 82%;
-  margin: 0;
-  padding: 6px 20px;
-  background: rgba(255, 248, 230, 0.92);
-  border-left: 1px solid rgba(143, 211, 255, 0.26);
-  border-right: 1px solid rgba(143, 211, 255, 0.26);
-  color: #176b8c;
-  font-size: 1rem;
-  font-weight: 700;
+  width: 86%;
+  margin-top: 10px;
+  padding: 10px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: rgba(255, 252, 244, 0.94);
+  border: 1.5px solid rgba(93, 172, 255, 0.35);
+  border-radius: 18px;
   box-sizing: border-box;
+  box-shadow: 0 12px 26px rgba(31, 45, 61, 0.14);
 }
 
-.card-stack {
-  position: relative;
-  z-index: 2;
-  width: 82%;
+.card-field {
   margin: 0;
-  padding: 8px 20px 18px;
-  background: rgba(255, 248, 230, 0.92);
-  border: 1px solid rgba(143, 211, 255, 0.26);
-  border-top: none;
-  border-radius: 0 0 16px 16px;
-  color: #3f4f5a;
-  font-size: 1rem;
-  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding-top: 5px;
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: #234163;
   overflow-wrap: anywhere;
+}
+
+.card-field:first-child {
+  padding-top: 0;
+}
+
+.card-field + .card-field {
+  border-top: 1px dashed rgba(93, 172, 255, 0.28);
+}
+
+.card-field-title {
+  color: #a8501f;
+  font-size: 1rem;
+}
+
+.card-field-icon {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .card-footer {
   width: 100%;
   margin-top: auto;
-  padding-top: 18px;
+  padding-top: 10px;
   color: rgba(28, 38, 53, 0.72);
   font-size: 0.73rem;
   font-weight: 700;
@@ -497,7 +549,7 @@ img {
   .builder-card {
     width: 100%;
     max-width: 100%;
-    min-height: 450px;
+    min-height: 500px;
     padding: 18px 14px 14px;
   }
 
@@ -507,47 +559,71 @@ img {
   }
 
   .card-photo {
-    width: 150px;
-    height: 170px;
+    width: 168px;
+    height: 200px;
+  }
+
+  .card-photo-badge {
+    width: 36px;
+    height: 36px;
+    right: -8px;
+    bottom: -8px;
+  }
+
+  .card-photo-badge svg {
+    width: 18px;
+    height: 18px;
   }
 
   .card-name {
-    width: 86%;
-    font-size: 1.35rem;
+    font-size: 1.3rem;
   }
 
-  .card-role,
-  .card-stack {
-    width: 86%;
-    font-size: 0.92rem;
+  .card-name-ribbon {
+    max-width: 94%;
+  }
+
+  .card-fields {
+    width: 92%;
+  }
+
+  .card-field {
+    font-size: 0.88rem;
   }
 }
 
-#builder-card .card-photo {
-  width: 190px !important;
-  height: 180px !important;
-  min-width: 190px !important;
-  min-height: 180px !important;
-  max-width: 190px !important;
-  max-height: 180px !important;
-  margin-top: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
-  border-radius: 12px;
-  border: 3px solid rgba(114, 211, 255, 0.9);
-  background: linear-gradient(145deg, #dfeeff, #a5d8ff);
-  color: #6181a0;
-  aspect-ratio: auto !important;
-  flex-shrink: 0 !important;
-  position: relative;
-  z-index: 2;
+.photo-adjust {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(93, 172, 255, 0.4);
 }
 
-#builder-card .card-photo img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
+.photo-adjust-zoom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
 }
+
+.photo-adjust-zoom span {
+  flex-shrink: 0;
+  margin-bottom: 0;
+  color: #2d3f5f;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.photo-adjust-zoom input[type="range"] {
+  flex: 1;
+  accent-color: #5ea7ff;
+}
+
+.photo-adjust-hint {
+  margin: 0;
+  color: rgba(58, 76, 99, 0.75);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
