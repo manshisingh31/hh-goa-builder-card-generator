@@ -582,11 +582,12 @@ function App() {
 
   // ==========================================
   // SHARE TO X
-  // Prefers a direct image attach via the native
-  // Web Share API (full-size image, no link-card
-  // shrinking). Falls back to a share link with
-  // proper OG image tags on desktop / unsupported
-  // browsers.
+  // Opens X's own compose screen directly via its
+  // web intent URL — no OS share-sheet / app-picker
+  // in between, and it behaves the same way on
+  // desktop and mobile. The card is uploaded first
+  // so the tweet's link preview (og:image) shows the
+  // actual square graphic instead of a blank card.
   // ==========================================
 
   const shareToX = async () => {
@@ -597,32 +598,14 @@ function App() {
     const caption =
       "HH GOA 2026 #FrameInGoa";
 
-    // ========================================
-    // DECIDE SHARE STRATEGY SYNCHRONOUSLY
-    // (must happen before any `await`, both to
-    // stay inside the user-gesture window for
-    // navigator.share and to keep the popup
-    // trick below working for the link fallback)
-    // ========================================
+    // Open the tab synchronously, before any `await`,
+    // so mobile/desktop popup blockers don't block it.
+    // We navigate this same tab to X once the share
+    // link is ready.
+    const xWindow =
+      window.open("about:blank", "_blank");
 
-    const supportsFileShare =
-      typeof navigator !== "undefined" &&
-      typeof navigator.canShare === "function" &&
-      navigator.canShare({
-        files: [
-          new File([""], "check.png", {
-            type: "image/png",
-          }),
-        ],
-      });
-
-    // Only the link fallback needs a pre-opened
-    // tab to dodge popup blockers.
-    const xWindow = supportsFileShare
-      ? null
-      : window.open("about:blank", "_blank");
-
-    if (!supportsFileShare && !xWindow) {
+    if (!xWindow) {
       setError(
         "Please allow pop-ups for this website and click Share to X again."
       );
@@ -637,7 +620,8 @@ function App() {
 
       // ======================================
       // GENERATE FINAL CARD
-      // Square (1:1) so X shows it uncropped.
+      // Square (1:1) so X's link preview shows
+      // it in full, uncropped.
       // ======================================
 
       const outputCanvas =
@@ -653,28 +637,7 @@ function App() {
         );
 
       // ======================================
-      // PREFERRED: DIRECT IMAGE ATTACH
-      // ======================================
-
-      if (supportsFileShare) {
-        try {
-          await navigator.share({
-            files: [file],
-            text: caption,
-          });
-        } catch (shareError) {
-          if (shareError?.name !== "AbortError") {
-            throw shareError;
-          }
-        }
-
-        setSharing(false);
-
-        return;
-      }
-
-      // ======================================
-      // FALLBACK: UPLOAD + SHARE LINK
+      // UPLOAD + SHARE LINK
       // ======================================
 
       const imageUrl =
@@ -742,7 +705,7 @@ function App() {
       );
 
       try {
-        xWindow?.close();
+        xWindow.close();
       } catch {
         // Ignore close errors.
       }
