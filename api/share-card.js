@@ -1,107 +1,75 @@
 export default async function handler(req, res) {
   try {
-    const imageUrl = req.query.image;
+    // ==========================================
+    // GET ORIGINAL VERCEL BLOB IMAGE URL
+    // ==========================================
 
-    if (!imageUrl) {
-      return res.status(400).send(
-        "Missing image"
-      );
+    const imageParam = req.query.image;
+
+    if (!imageParam) {
+      return res.status(400).send("Missing image");
     }
 
-    const decodedImageUrl =
-      decodeURIComponent(
-        String(imageUrl)
-      );
+    // Vercel normally gives us the decoded query value.
+    const imageUrl = Array.isArray(imageParam)
+      ? imageParam[0]
+      : String(imageParam);
 
-    // Validate the original Blob URL.
+    // ==========================================
+    // VALIDATE IMAGE URL
+    // ==========================================
+
     let parsedImageUrl;
 
     try {
-      parsedImageUrl =
-        new URL(decodedImageUrl);
+      parsedImageUrl = new URL(imageUrl);
     } catch {
-      return res.status(400).send(
-        "Invalid image URL"
-      );
+      return res.status(400).send("Invalid image URL");
     }
 
-    // Only HTTPS.
-    if (
-      parsedImageUrl.protocol !==
-      "https:"
-    ) {
-      return res.status(400).send(
-        "Invalid image URL"
-      );
+    if (parsedImageUrl.protocol !== "https:") {
+      return res.status(400).send("Invalid image URL");
     }
 
-    // Only allow our Vercel Blob storage.
     if (
       !parsedImageUrl.hostname.endsWith(
         ".public.blob.vercel-storage.com"
       )
     ) {
-      return res.status(400).send(
-        "Image host not allowed"
-      );
+      return res.status(400).send("Image host not allowed");
     }
 
     // ==========================================
-    // PRODUCTION DOMAIN
+    // CURRENT PAGE URL
     // ==========================================
 
-    const host =
-      req.headers.host;
+    const host = req.headers.host;
 
     const protocol =
-      req.headers["x-forwarded-proto"] ||
-      "https";
+      req.headers["x-forwarded-proto"] || "https";
 
-    const origin =
-      `${protocol}://${host}`;
+    const origin = `${protocol}://${host}`;
 
-    // ==========================================
-    // PROXY IMAGE URL
-    //
-    // X will request this URL as og:image.
-    //
-    // Instead of asking X to directly fetch the
-    // Vercel Blob URL, we serve the PNG through
-    // our own API endpoint.
-    // ==========================================
-
-    const proxyImageUrl =
-      `${origin}/api/card-image?image=${encodeURIComponent(
-        decodedImageUrl
-      )}`;
-
-    // ==========================================
-    // CURRENT SHARE PAGE URL
-    // ==========================================
-
-    const pageUrl =
-      `${origin}${req.url}`;
+    const pageUrl = `${origin}${req.url}`;
 
     // ==========================================
     // HTML ESCAPING
     // ==========================================
 
-    const safeProxyImageUrl =
-      proxyImageUrl
-        .replace(/&/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+    const safeImageUrl = imageUrl
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
 
-    const safePageUrl =
-      pageUrl
-        .replace(/&/g, "&amp;")
-        .replace(/"/g, "&quot;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;");
+    const safePageUrl = pageUrl
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
 
     // ==========================================
-    // SHARE PAGE HTML
+    // SHARE PAGE
     // ==========================================
 
     const html = `<!DOCTYPE html>
@@ -142,14 +110,18 @@ export default async function handler(req, res) {
     content="${safePageUrl}"
   >
 
+  <!-- IMPORTANT:
+       X now receives the ORIGINAL PNG directly.
+       No /api/card-image proxy. -->
+
   <meta
     property="og:image"
-    content="${safeProxyImageUrl}"
+    content="${safeImageUrl}"
   >
 
   <meta
     property="og:image:secure_url"
-    content="${safeProxyImageUrl}"
+    content="${safeImageUrl}"
   >
 
   <meta
@@ -188,7 +160,7 @@ export default async function handler(req, res) {
 
   <meta
     name="twitter:image"
-    content="${safeProxyImageUrl}"
+    content="${safeImageUrl}"
   >
 
   <meta
@@ -196,10 +168,9 @@ export default async function handler(req, res) {
     content="HH GOA 2026 Builder Card"
   >
 
-  <meta
-    name="twitter:url"
-    content="${safePageUrl}"
-  >
+  <!-- ===================================== -->
+  <!-- PAGE STYLE -->
+  <!-- ===================================== -->
 
   <style>
 
@@ -222,7 +193,7 @@ export default async function handler(req, res) {
 
     .container {
       width: 100%;
-      max-width: 600px;
+      max-width: 700px;
       padding: 30px;
       box-sizing: border-box;
     }
@@ -254,7 +225,7 @@ export default async function handler(req, res) {
 
     <img
       class="card-image"
-      src="${safeProxyImageUrl}"
+      src="${safeImageUrl}"
       alt="HH GOA 2026 Builder Card"
     >
 
@@ -291,9 +262,7 @@ export default async function handler(req, res) {
       "nosniff"
     );
 
-    return res.status(200).send(
-      html
-    );
+    return res.status(200).send(html);
 
   } catch (error) {
     console.error(
