@@ -126,15 +126,15 @@ content="image/png"
 
 <meta
 property="og:image:width"
-content="1080"
+content="1350"
 
-> 
+>
 
 <meta
 property="og:image:height"
 content="1350"
 
-> 
+>
 
   <!-- ===================================== -->    <!-- X / TWITTER -->    <!-- ===================================== -->  <meta
 name="twitter:card"
