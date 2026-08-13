@@ -672,7 +672,7 @@ function App() {
 
               {sharing
                 ? "Preparing..."
-                : "𝕏 Share to X"}
+                : "Share to 𝕏"}
 
             </button>
 
@@ -759,6 +759,9 @@ function App() {
 
             <div
               className="card-footer"
+              style={{
+                margin: "15px"
+              }}
             >
               HH GOA 2026
             </div>
